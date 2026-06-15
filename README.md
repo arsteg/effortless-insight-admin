@@ -1,0 +1,1 @@
+# effortless-insight-admin
