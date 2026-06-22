@@ -34,12 +34,25 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
     setError(null)
     try {
-      // API call would go here
-      // await adminApi.auth.forgotPassword(data.email)
-      console.log('Forgot password:', data.email)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/auth/forgot-password`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: data.email }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Failed to send reset email')
+      }
+
       setIsSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      // Always show success to prevent email enumeration
+      // In production, log the error server-side but show success to user
+      setIsSuccess(true)
     } finally {
       setIsLoading(false)
     }

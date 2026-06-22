@@ -300,6 +300,106 @@ export const adminAiOpsApi = {
   },
 }
 
+// Content Management types
+export interface ContentPage {
+  id: string
+  contentType: string
+  slug: string
+  title: string
+  excerpt?: string
+  content?: string
+  contentFormat?: string
+  category?: string
+  tags?: string[]
+  status: string
+  version: number
+  displayOrder: number
+  isFeatured: boolean
+  allowFeedback?: boolean
+  viewCount: number
+  helpfulCount: number
+  notHelpfulCount: number
+  metaTitle?: string
+  metaDescription?: string
+  language?: string
+  publishedAt?: string
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface CreateContentRequest {
+  contentType: string
+  slug: string
+  title: string
+  excerpt?: string
+  content: string
+  contentFormat?: string
+  category?: string
+  tags?: string[]
+  displayOrder?: number
+  isFeatured?: boolean
+  allowFeedback?: boolean
+  metaTitle?: string
+  metaDescription?: string
+  language?: string
+}
+
+export interface UpdateContentRequest {
+  slug?: string
+  title?: string
+  excerpt?: string
+  content?: string
+  contentFormat?: string
+  category?: string
+  tags?: string[]
+  displayOrder?: number
+  isFeatured?: boolean
+  allowFeedback?: boolean
+  metaTitle?: string
+  metaDescription?: string
+}
+
+export const adminContentApi = {
+  list: async (params?: {
+    contentType?: string
+    status?: string
+    category?: string
+    search?: string
+    page?: number
+    pageSize?: number
+  }): Promise<PaginatedResponse<ContentPage>> => {
+    const response = await adminClient.get('/admin/v1/content', { params })
+    return extractData(response)
+  },
+  get: async (id: string): Promise<ContentPage> => {
+    const response = await adminClient.get(`/admin/v1/content/${id}`)
+    return extractData(response)
+  },
+  create: async (data: CreateContentRequest): Promise<ContentPage> => {
+    const response = await adminClient.post('/admin/v1/content', data)
+    return extractData(response)
+  },
+  update: async (id: string, data: UpdateContentRequest): Promise<ContentPage> => {
+    const response = await adminClient.put(`/admin/v1/content/${id}`, data)
+    return extractData(response)
+  },
+  publish: async (id: string): Promise<ContentPage> => {
+    const response = await adminClient.post(`/admin/v1/content/${id}/publish`)
+    return extractData(response)
+  },
+  archive: async (id: string): Promise<ContentPage> => {
+    const response = await adminClient.post(`/admin/v1/content/${id}/archive`)
+    return extractData(response)
+  },
+  delete: async (id: string): Promise<void> => {
+    await adminClient.delete(`/admin/v1/content/${id}`)
+  },
+  getCategories: async (contentType?: string): Promise<string[]> => {
+    const response = await adminClient.get('/admin/v1/content/categories', { params: { contentType } })
+    return extractData(response)
+  },
+}
+
 export const adminApi = {
   auth: adminAuthApi,
   dashboard: adminDashboardApi,
@@ -309,6 +409,7 @@ export const adminApi = {
   audit: adminAuditApi,
   management: adminManagementApi,
   aiOps: adminAiOpsApi,
+  content: adminContentApi,
   tokens: adminTokens,
 }
 
