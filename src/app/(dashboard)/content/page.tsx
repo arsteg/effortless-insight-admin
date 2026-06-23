@@ -108,7 +108,7 @@ export default function ContentPage() {
     if (error) {
       return (
         <EmptyState
-          icon={FileText}
+          icon={<FileText className="h-6 w-6 text-muted-foreground" />}
           title="Error loading content"
           description="There was an error loading the content. Please try again."
         />
@@ -120,7 +120,13 @@ export default function ContentPage() {
     if (items.length === 0) {
       return (
         <EmptyState
-          icon={contentType === 'faq' ? HelpCircle : contentType === 'notice_template' ? Bell : FileText}
+          icon={
+            contentType === 'faq'
+              ? <HelpCircle className="h-6 w-6 text-muted-foreground" />
+              : contentType === 'notice_template'
+                ? <Bell className="h-6 w-6 text-muted-foreground" />
+                : <FileText className="h-6 w-6 text-muted-foreground" />
+          }
           title={`No ${contentType.replace('_', ' ')}s found`}
           description={`Create your first ${contentType.replace('_', ' ')} to get started.`}
         />

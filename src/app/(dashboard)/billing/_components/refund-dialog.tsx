@@ -59,10 +59,15 @@ export function RefundDialog({ invoice, open, onOpenChange }: RefundDialogProps)
   const handleSubmit = async (data: RefundFormData) => {
     if (!invoice) return
 
+    if (!invoice.paymentId) {
+      // This shouldn't happen for paid invoices, but guard against it
+      return
+    }
+
     const amount = data.refundType === 'full' ? null : data.amount ?? null
 
     await processRefund.mutateAsync({
-      paymentId: invoice.id, // Using invoice ID as payment reference
+      paymentId: invoice.paymentId,
       amount,
       reason: data.reason,
     })
@@ -70,6 +75,8 @@ export function RefundDialog({ invoice, open, onOpenChange }: RefundDialogProps)
     form.reset()
     setRefundType('full')
   }
+
+  const canRefund = invoice?.paymentId && invoice?.status === 'paid'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,13 +88,24 @@ export function RefundDialog({ invoice, open, onOpenChange }: RefundDialogProps)
           </DialogDescription>
         </DialogHeader>
 
-        <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-            This action will initiate a refund through Razorpay. The refund may take 5-7 business
-            days to process.
-          </AlertDescription>
-        </Alert>
+        {!canRefund ? (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {!invoice?.paymentId
+                ? 'This invoice does not have an associated payment and cannot be refunded.'
+                : 'Only paid invoices can be refunded.'}
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+              This action will initiate a refund through Razorpay. The refund may take 5-7 business
+              days to process.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="rounded-lg border p-4 bg-muted/50">
@@ -164,7 +182,7 @@ export function RefundDialog({ invoice, open, onOpenChange }: RefundDialogProps)
             >
               Cancel
             </Button>
-            <Button type="submit" variant="destructive" disabled={processRefund.isPending}>
+            <Button type="submit" variant="destructive" disabled={processRefund.isPending || !canRefund}>
               {processRefund.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

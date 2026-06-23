@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2, Shield, Key, User, Bell } from 'lucide-react'
+import { toast } from 'sonner'
+import { Loader2, Shield, Key, User, Bell, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
@@ -35,6 +36,43 @@ export default function SettingsPage() {
 
   const [showMfaSetup, setShowMfaSetup] = useState(false)
   const [mfaCode, setMfaCode] = useState('')
+  const [isSavingNotifications, setIsSavingNotifications] = useState(false)
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    criticalAlerts: true,
+    securityAlerts: true,
+    dailySummary: false,
+    emailNotifications: true,
+  })
+
+  const handleNotificationChange = (key: keyof typeof notificationPrefs, value: boolean) => {
+    setNotificationPrefs((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleSaveNotifications = async () => {
+    setIsSavingNotifications(true)
+    try {
+      // In a real implementation, this would call an API endpoint
+      // For now, we'll simulate saving to localStorage
+      localStorage.setItem('admin_notification_prefs', JSON.stringify(notificationPrefs))
+      toast.success('Notification preferences saved')
+    } catch (error) {
+      toast.error('Failed to save notification preferences')
+    } finally {
+      setIsSavingNotifications(false)
+    }
+  }
+
+  // Load saved preferences on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_notification_prefs')
+    if (saved) {
+      try {
+        setNotificationPrefs(JSON.parse(saved))
+      } catch {
+        // Use defaults if parsing fails
+      }
+    }
+  }, [])
 
   const passwordForm = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -297,44 +335,70 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Critical Alerts</Label>
+                  <Label htmlFor="critical-alerts">Critical Alerts</Label>
                   <p className="text-sm text-muted-foreground">
                     Receive notifications for critical system issues
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  id="critical-alerts"
+                  checked={notificationPrefs.criticalAlerts}
+                  onCheckedChange={(checked) => handleNotificationChange('criticalAlerts', checked)}
+                />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Security Alerts</Label>
+                  <Label htmlFor="security-alerts">Security Alerts</Label>
                   <p className="text-sm text-muted-foreground">
                     Notifications for security-related events
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  id="security-alerts"
+                  checked={notificationPrefs.securityAlerts}
+                  onCheckedChange={(checked) => handleNotificationChange('securityAlerts', checked)}
+                />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Daily Summary</Label>
+                  <Label htmlFor="daily-summary">Daily Summary</Label>
                   <p className="text-sm text-muted-foreground">
                     Receive a daily summary of platform activity
                   </p>
                 </div>
-                <Switch />
+                <Switch
+                  id="daily-summary"
+                  checked={notificationPrefs.dailySummary}
+                  onCheckedChange={(checked) => handleNotificationChange('dailySummary', checked)}
+                />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
+                  <Label htmlFor="email-notifications">Email Notifications</Label>
                   <p className="text-sm text-muted-foreground">
                     Receive notifications via email
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  id="email-notifications"
+                  checked={notificationPrefs.emailNotifications}
+                  onCheckedChange={(checked) => handleNotificationChange('emailNotifications', checked)}
+                />
               </div>
             </CardContent>
+            <CardFooter>
+              <Button onClick={handleSaveNotifications} disabled={isSavingNotifications}>
+                {isSavingNotifications ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save Preferences
+              </Button>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>

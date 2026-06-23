@@ -416,6 +416,7 @@ export interface AdminInvoiceListItem {
   dueDate: string
   paidAt?: string
   createdAt: string
+  paymentId?: string // Payment ID for refund processing
 }
 
 // ============================================================================

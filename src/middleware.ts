@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const publicPaths = ['/login', '/forgot-password', '/reset-password']
-const authPaths = ['/login']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -13,20 +12,26 @@ export function middleware(request: NextRequest) {
   // Check for auth token in cookies
   const hasToken = request.cookies.has('admin_access_token')
 
-  // Also check localStorage token via a custom header (set by client)
-  // For SSR, we rely on cookies; client-side auth is handled by RequireAuth
-
   // If accessing auth pages while logged in, redirect to dashboard
-  if (authPaths.some((path) => pathname.startsWith(path)) && hasToken) {
+  if (isPublicPath && hasToken) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // For protected routes, the RequireAuth component handles the redirect
-  // Middleware here is lightweight and lets client-side auth handle most cases
+  // Protect non-public routes - redirect to login if no token
+  if (!isPublicPath && !hasToken) {
+    const loginUrl = new URL('/login', request.url)
+    // Preserve the original URL to redirect back after login
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
 
   // Redirect root to dashboard or login
   if (pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (hasToken) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    } else {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
   }
 
   return NextResponse.next()

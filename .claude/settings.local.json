@@ -5,7 +5,26 @@
       "Bash(dotnet ef database:*)",
       "Bash(ls:*)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet ef dbcontext:*)"
+      "Bash(dotnet ef dbcontext:*)",
+      "Bash(dotnet run:*)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd //c:*)",
+      "Bash(powershell:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(dotnet add package:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:resend.com)",
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(test:*)",
+      "Bash(redis-cli ping:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker start:*)",
+      "Bash(timeout /t:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

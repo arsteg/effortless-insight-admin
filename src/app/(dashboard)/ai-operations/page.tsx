@@ -29,13 +29,24 @@ import { PageHeader, DataTable, StatusBadge, LoadingState, StatCard, type Column
 import { RequirePermission } from '@/components/auth'
 import { ADMIN_PERMISSIONS } from '@/types/admin'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import {
   useAIQueueStats,
   useAIJobs,
   useRetryAIJob,
   useCancelAIJob,
   useAIPrompts,
+  useUpdateAIPrompt,
 } from '@/hooks/use-ai-ops'
-import type { AIJob } from '@/lib/api/admin'
+import type { AIJob, AIPrompt } from '@/lib/api/admin'
 import { cn } from '@/lib/utils'
 
 export default function AIOperationsPage() {
@@ -43,6 +54,8 @@ export default function AIOperationsPage() {
   const [jobTypeFilter, setJobTypeFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
+  const [editingPrompt, setEditingPrompt] = useState<AIPrompt | null>(null)
+  const [editedTemplate, setEditedTemplate] = useState('')
 
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useAIQueueStats()
   const { data: jobs, isLoading: jobsLoading, refetch: refetchJobs } = useAIJobs({
@@ -55,6 +68,26 @@ export default function AIOperationsPage() {
 
   const retryJob = useRetryAIJob()
   const cancelJob = useCancelAIJob()
+  const updatePrompt = useUpdateAIPrompt()
+
+  const handleEditPrompt = (prompt: AIPrompt) => {
+    setEditingPrompt(prompt)
+    setEditedTemplate(prompt.template)
+  }
+
+  const handleSavePrompt = () => {
+    if (editingPrompt && editedTemplate) {
+      updatePrompt.mutate(
+        { promptId: editingPrompt.id, template: editedTemplate },
+        {
+          onSuccess: () => {
+            setEditingPrompt(null)
+            setEditedTemplate('')
+          },
+        }
+      )
+    }
+  }
 
   const handleRefresh = () => {
     refetchStats()
@@ -336,7 +369,7 @@ export default function AIOperationsPage() {
                         </p>
                       </div>
                       <RequirePermission permission={ADMIN_PERMISSIONS.AI_OPS_PROMPTS}>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => handleEditPrompt(prompt)}>
                           Edit
                         </Button>
                       </RequirePermission>
@@ -352,6 +385,49 @@ export default function AIOperationsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Prompt Dialog */}
+      <Dialog open={!!editingPrompt} onOpenChange={(open) => !open && setEditingPrompt(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Edit Prompt: {editingPrompt?.name}</DialogTitle>
+            <DialogDescription>
+              {editingPrompt?.description}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto py-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Badge variant="outline">Version {editingPrompt?.version}</Badge>
+                {editingPrompt?.isActive && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">Active</Badge>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="template">Prompt Template</Label>
+                <Textarea
+                  id="template"
+                  value={editedTemplate}
+                  onChange={(e) => setEditedTemplate(e.target.value)}
+                  className="min-h-[300px] font-mono text-sm"
+                  placeholder="Enter prompt template..."
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingPrompt(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSavePrompt}
+              disabled={updatePrompt.isPending || !editedTemplate.trim()}
+            >
+              {updatePrompt.isPending ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
