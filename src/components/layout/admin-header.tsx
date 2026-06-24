@@ -70,22 +70,20 @@ export function AdminHeader() {
         </Button>
 
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" className="flex items-center gap-2 px-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={adminUser?.avatarUrl} alt={adminUser?.name} />
-                <AvatarFallback>
-                  {adminUser?.name ? getInitials(adminUser.name) : 'AD'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden md:flex flex-col items-start">
-                <span className="text-sm font-medium">{adminUser?.name}</span>
-                <Badge variant="secondary" className="text-[10px] h-4 px-1">
-                  {adminUser?.role ? ADMIN_ROLE_LABELS[adminUser.role] : 'Admin'}
-                </Badge>
-              </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </Button>
+          <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={adminUser?.avatarUrl} alt={adminUser?.name} />
+              <AvatarFallback>
+                {adminUser?.name ? getInitials(adminUser.name) : 'AD'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="hidden md:flex flex-col items-start">
+              <span className="text-sm font-medium">{adminUser?.name}</span>
+              <Badge variant="secondary" className="text-[10px] h-4 px-1">
+                {adminUser?.role ? ADMIN_ROLE_LABELS[adminUser.role] : 'Admin'}
+              </Badge>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
