@@ -192,6 +192,7 @@ export interface AdminUserSearchParams {
   search?: string
   status?: string
   plan?: string
+  organizationId?: string
   sortBy?: string
   sortDesc?: boolean
   page?: number

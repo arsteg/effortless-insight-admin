@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -16,6 +17,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -30,6 +32,7 @@ import {
   useUnsuspendUser,
   useResetUserPassword,
 } from '@/hooks/use-users'
+import { useOrganizations } from '@/hooks/use-organizations'
 import { SuspendUserDialog } from './_components/suspend-user-dialog'
 import { ImpersonateUserDialog } from './_components/impersonate-user-dialog'
 import { DeleteUserDialog } from './_components/delete-user-dialog'
@@ -39,6 +42,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
+  const [organizationFilter, setOrganizationFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
@@ -47,10 +51,14 @@ export default function UsersPage() {
   const [impersonateUser, setImpersonateUser] = useState<AdminUserListItem | null>(null)
   const [deleteUser, setDeleteUser] = useState<AdminUserListItem | null>(null)
 
+  // Fetch organizations for filter dropdown
+  const { data: organizationsData } = useOrganizations({ pageSize: 100 })
+
   const { data, isLoading } = useUsers({
     search: search || undefined,
     status: statusFilter !== 'all' ? statusFilter : undefined,
     plan: planFilter !== 'all' ? planFilter : undefined,
+    organizationId: organizationFilter !== 'all' ? organizationFilter : undefined,
     page,
     pageSize,
   })
@@ -111,58 +119,66 @@ export default function UsersPage() {
       className: 'w-[50px]',
       cell: (user) => (
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+          <DropdownMenuTrigger
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Open menu</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => router.push(`/users/${user.id}`)}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
-            <RequirePermission permission={ADMIN_PERMISSIONS.USERS_IMPERSONATE}>
-              <DropdownMenuItem onClick={() => setImpersonateUser(user)}>
-                <UsersIcon className="mr-2 h-4 w-4" />
-                Impersonate
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => router.push(`/users/${user.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
               </DropdownMenuItem>
-            </RequirePermission>
+              <RequirePermission permission={ADMIN_PERMISSIONS.USERS_IMPERSONATE}>
+                <DropdownMenuItem onClick={() => setImpersonateUser(user)}>
+                  <UsersIcon className="mr-2 h-4 w-4" />
+                  Impersonate
+                </DropdownMenuItem>
+              </RequirePermission>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <RequirePermission permission={ADMIN_PERMISSIONS.USERS_RESET_PASSWORD}>
-              <DropdownMenuItem
-                onClick={() => resetPasswordMutation.mutate(user.id)}
-                disabled={resetPasswordMutation.isPending}
-              >
-                <Key className="mr-2 h-4 w-4" />
-                Reset Password
-              </DropdownMenuItem>
-            </RequirePermission>
-            <RequirePermission permission={ADMIN_PERMISSIONS.USERS_SUSPEND}>
-              {user.status === 'suspended' ? (
+            <DropdownMenuGroup>
+              <RequirePermission permission={ADMIN_PERMISSIONS.USERS_RESET_PASSWORD}>
                 <DropdownMenuItem
-                  onClick={() => unsuspendMutation.mutate(user.id)}
-                  disabled={unsuspendMutation.isPending}
+                  onClick={() => resetPasswordMutation.mutate(user.id)}
+                  disabled={resetPasswordMutation.isPending}
                 >
-                  <UserCheck className="mr-2 h-4 w-4" />
-                  Unsuspend
+                  <Key className="mr-2 h-4 w-4" />
+                  Reset Password
                 </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => setSuspendUser(user)}>
-                  <UserX className="mr-2 h-4 w-4" />
-                  Suspend
-                </DropdownMenuItem>
-              )}
-            </RequirePermission>
+              </RequirePermission>
+              <RequirePermission permission={ADMIN_PERMISSIONS.USERS_SUSPEND}>
+                {user.status === 'suspended' ? (
+                  <DropdownMenuItem
+                    onClick={() => unsuspendMutation.mutate(user.id)}
+                    disabled={unsuspendMutation.isPending}
+                  >
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Unsuspend
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => setSuspendUser(user)}>
+                    <UserX className="mr-2 h-4 w-4" />
+                    Suspend
+                  </DropdownMenuItem>
+                )}
+              </RequirePermission>
+            </DropdownMenuGroup>
             <RequirePermission permission={ADMIN_PERMISSIONS.USERS_DELETE}>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setDeleteUser(user)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete User
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => setDeleteUser(user)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete User
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </RequirePermission>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -179,15 +195,43 @@ export default function UsersPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-4">
+        <Select
+          value={organizationFilter}
+          onValueChange={(value) => {
+            setOrganizationFilter(value ?? 'all')
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="w-[220px]">
+            <SelectValue placeholder="Organization">
+              {organizationFilter === 'all'
+                ? 'All Organizations'
+                : organizationsData?.items?.find((org) => org.id === organizationFilter)?.name ?? 'Select Organization'}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="all">All Organizations</SelectItem>
+              {organizationsData?.items?.map((org) => (
+                <SelectItem key={org.id} value={org.id}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
         <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value ?? 'all')}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="suspended">Suspended</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectGroup>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </Select>
 
@@ -196,11 +240,13 @@ export default function UsersPage() {
             <SelectValue placeholder="Plan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Plans</SelectItem>
-            <SelectItem value="free">Free</SelectItem>
-            <SelectItem value="starter">Starter</SelectItem>
-            <SelectItem value="professional">Professional</SelectItem>
-            <SelectItem value="enterprise">Enterprise</SelectItem>
+            <SelectGroup>
+              <SelectItem value="all">All Plans</SelectItem>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="starter">Starter</SelectItem>
+              <SelectItem value="professional">Professional</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>

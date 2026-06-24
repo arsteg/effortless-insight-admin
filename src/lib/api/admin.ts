@@ -71,10 +71,35 @@ export const adminDashboardApi = {
   },
 }
 
+// Backend paginated response structure
+interface BackendPaginatedResponse<T> {
+  users?: T[];
+  organizations?: T[];
+  admins?: T[];
+  subscriptions?: T[];
+  invoices?: T[];
+  jobs?: T[];
+  pages?: T[];
+  pagination: { page: number; pageSize: number; total: number; totalPages: number }
+}
+
+// Helper to transform backend paginated response to frontend format
+function transformPaginatedResponse<T>(data: BackendPaginatedResponse<T>): PaginatedResponse<T> {
+  const items = data.users || data.organizations || data.admins || data.subscriptions || data.invoices || data.jobs || data.pages || []
+  return {
+    items: items as T[],
+    totalCount: data.pagination.total,
+    page: data.pagination.page,
+    pageSize: data.pagination.pageSize,
+    totalPages: data.pagination.totalPages,
+  }
+}
+
 export const adminUsersApi = {
   list: async (params?: AdminUserSearchParams): Promise<PaginatedResponse<AdminUserListItem>> => {
     const response = await adminClient.get('/admin/users', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AdminUserListItem>>(response)
+    return transformPaginatedResponse(data)
   },
   get: async (userId: string): Promise<AdminUserDetailResponse> => {
     const response = await adminClient.get(`/admin/users/${userId}`)
@@ -104,7 +129,8 @@ export const adminUsersApi = {
 export const adminOrganizationsApi = {
   list: async (params?: AdminOrganizationSearchParams): Promise<PaginatedResponse<AdminOrganizationListItem>> => {
     const response = await adminClient.get('/admin/organizations', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AdminOrganizationListItem>>(response)
+    return transformPaginatedResponse(data)
   },
   get: async (orgId: string): Promise<AdminOrganizationDetail> => {
     const response = await adminClient.get(`/admin/organizations/${orgId}`)
@@ -139,7 +165,8 @@ export const adminBillingApi = {
   },
   listSubscriptions: async (params?: AdminSubscriptionSearchParams): Promise<PaginatedResponse<AdminSubscriptionListItem>> => {
     const response = await adminClient.get('/admin/billing/subscriptions', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AdminSubscriptionListItem>>(response)
+    return transformPaginatedResponse(data)
   },
   getSubscription: async (subscriptionId: string): Promise<AdminSubscriptionDetail> => {
     const response = await adminClient.get(`/admin/billing/subscriptions/${subscriptionId}`)
@@ -154,7 +181,8 @@ export const adminBillingApi = {
   },
   listInvoices: async (params?: { search?: string; status?: string; fromDate?: string; toDate?: string; page?: number; pageSize?: number }): Promise<PaginatedResponse<AdminInvoiceListItem>> => {
     const response = await adminClient.get('/admin/billing/invoices', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AdminInvoiceListItem>>(response)
+    return transformPaginatedResponse(data)
   },
 }
 
@@ -188,7 +216,8 @@ export const adminAuditApi = {
 export const adminManagementApi = {
   list: async (params?: { search?: string; role?: string; isActive?: boolean; page?: number; pageSize?: number }): Promise<PaginatedResponse<AdminUser>> => {
     const response = await adminClient.get('/admin/admins', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AdminUser>>(response)
+    return transformPaginatedResponse(data)
   },
   get: async (adminId: string): Promise<AdminUserDetail> => {
     const response = await adminClient.get(`/admin/admins/${adminId}`)
@@ -274,7 +303,8 @@ export const adminAiOpsApi = {
     pageSize?: number
   }): Promise<PaginatedResponse<AIJob>> => {
     const response = await adminClient.get('/admin/ai/jobs', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<AIJob>>(response)
+    return transformPaginatedResponse(data)
   },
   getJob: async (jobId: string): Promise<AIJob> => {
     const response = await adminClient.get(`/admin/ai/jobs/${jobId}`)
@@ -369,7 +399,8 @@ export const adminContentApi = {
     pageSize?: number
   }): Promise<PaginatedResponse<ContentPage>> => {
     const response = await adminClient.get('/admin/v1/content', { params })
-    return extractData(response)
+    const data = extractData<BackendPaginatedResponse<ContentPage>>(response)
+    return transformPaginatedResponse(data)
   },
   get: async (id: string): Promise<ContentPage> => {
     const response = await adminClient.get(`/admin/v1/content/${id}`)

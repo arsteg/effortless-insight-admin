@@ -46,7 +46,10 @@ export default function OrganizationDetailPage({ params }: PageProps) {
   if (error || !org) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Organization not found</p>
+        <p className="text-muted-foreground">
+          {error ? `Error: ${error.message}` : 'Organization not found'}
+        </p>
+        <p className="text-xs text-muted-foreground mt-2">ID: {resolvedParams.id}</p>
         <Button variant="outline" onClick={() => router.back()} className="mt-4">
           Go Back
         </Button>

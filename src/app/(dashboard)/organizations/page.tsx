@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -16,6 +17,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -112,57 +114,65 @@ export default function OrganizationsPage() {
       className: 'w-[50px]',
       cell: (org) => (
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+          <DropdownMenuTrigger
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Open menu</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => router.push(`/organizations/${org.id}`)}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <RequirePermission permission={ADMIN_PERMISSIONS.ORGS_CREDITS}>
-              <DropdownMenuItem onClick={() => setCreditOrg(org)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Apply Credit
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => router.push(`/organizations/${org.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
               </DropdownMenuItem>
-            </RequirePermission>
-            <RequirePermission permission={ADMIN_PERMISSIONS.ORGS_UPDATE}>
-              {org.status === 'suspended' ? (
-                <DropdownMenuItem
-                  onClick={() => unsuspendMutation.mutate(org.id)}
-                  disabled={unsuspendMutation.isPending}
-                >
-                  <UserCheck className="mr-2 h-4 w-4" />
-                  Unsuspend
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <RequirePermission permission={ADMIN_PERMISSIONS.ORGS_CREDITS}>
+                <DropdownMenuItem onClick={() => setCreditOrg(org)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Apply Credit
                 </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem
-                  onClick={() =>
-                    suspendMutation.mutate({
-                      orgId: org.id,
-                      reason: 'Administrative action',
-                    })
-                  }
-                  disabled={suspendMutation.isPending}
-                >
-                  <UserX className="mr-2 h-4 w-4" />
-                  Suspend
-                </DropdownMenuItem>
-              )}
-            </RequirePermission>
+              </RequirePermission>
+              <RequirePermission permission={ADMIN_PERMISSIONS.ORGS_UPDATE}>
+                {org.status === 'suspended' ? (
+                  <DropdownMenuItem
+                    onClick={() => unsuspendMutation.mutate(org.id)}
+                    disabled={unsuspendMutation.isPending}
+                  >
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Unsuspend
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      suspendMutation.mutate({
+                        orgId: org.id,
+                        reason: 'Administrative action',
+                      })
+                    }
+                    disabled={suspendMutation.isPending}
+                  >
+                    <UserX className="mr-2 h-4 w-4" />
+                    Suspend
+                  </DropdownMenuItem>
+                )}
+              </RequirePermission>
+            </DropdownMenuGroup>
             <RequirePermission permission={ADMIN_PERMISSIONS.ORGS_DELETE}>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setDeleteOrg(org)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Organization
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => setDeleteOrg(org)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Organization
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </RequirePermission>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -184,9 +194,11 @@ export default function OrganizationsPage() {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="suspended">Suspended</SelectItem>
+            <SelectGroup>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </Select>
 
@@ -195,11 +207,13 @@ export default function OrganizationsPage() {
             <SelectValue placeholder="Plan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Plans</SelectItem>
-            <SelectItem value="free">Free</SelectItem>
-            <SelectItem value="starter">Starter</SelectItem>
-            <SelectItem value="professional">Professional</SelectItem>
-            <SelectItem value="enterprise">Enterprise</SelectItem>
+            <SelectGroup>
+              <SelectItem value="all">All Plans</SelectItem>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="starter">Starter</SelectItem>
+              <SelectItem value="professional">Professional</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>
