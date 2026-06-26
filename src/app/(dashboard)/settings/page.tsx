@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Shield, Key, User, Bell, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/common'
 import { useAdminAuthStore } from '@/stores/admin-auth-store'
 import { useAdminAuth, useMfaSetup } from '@/hooks/use-admin-auth'
+import { adminAuthApi, type NotificationPreferences } from '@/lib/api/admin'
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
@@ -30,49 +33,49 @@ const changePasswordSchema = z.object({
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const defaultTab = ['profile', 'security', 'notifications'].includes(tabParam || '') ? tabParam! : 'profile'
+
   const { adminUser } = useAdminAuthStore()
   const { changePassword, isChangingPassword } = useAdminAuth()
   const mfaSetup = useMfaSetup()
 
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const [showMfaSetup, setShowMfaSetup] = useState(false)
   const [mfaCode, setMfaCode] = useState('')
-  const [isSavingNotifications, setIsSavingNotifications] = useState(false)
-  const [notificationPrefs, setNotificationPrefs] = useState({
-    criticalAlerts: true,
-    securityAlerts: true,
-    dailySummary: false,
-    emailNotifications: true,
+  const queryClient = useQueryClient()
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    if (tabParam && ['profile', 'security', 'notifications'].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
+
+  // Fetch notification preferences from server
+  const { data: notificationPrefs, isLoading: isLoadingPrefs } = useQuery({
+    queryKey: ['admin', 'notification-preferences'],
+    queryFn: () => adminAuthApi.getNotificationPreferences(),
+    staleTime: 60000,
   })
 
-  const handleNotificationChange = (key: keyof typeof notificationPrefs, value: boolean) => {
-    setNotificationPrefs((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const handleSaveNotifications = async () => {
-    setIsSavingNotifications(true)
-    try {
-      // In a real implementation, this would call an API endpoint
-      // For now, we'll simulate saving to localStorage
-      localStorage.setItem('admin_notification_prefs', JSON.stringify(notificationPrefs))
+  const updatePrefsMutation = useMutation({
+    mutationFn: (prefs: NotificationPreferences) => adminAuthApi.updateNotificationPreferences(prefs),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notification-preferences'] })
       toast.success('Notification preferences saved')
-    } catch (error) {
+    },
+    onError: () => {
       toast.error('Failed to save notification preferences')
-    } finally {
-      setIsSavingNotifications(false)
-    }
-  }
+    },
+  })
 
-  // Load saved preferences on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('admin_notification_prefs')
-    if (saved) {
-      try {
-        setNotificationPrefs(JSON.parse(saved))
-      } catch {
-        // Use defaults if parsing fails
-      }
-    }
-  }, [])
+  const handleNotificationChange = (key: keyof NotificationPreferences, value: boolean) => {
+    if (!notificationPrefs) return
+    const newPrefs = { ...notificationPrefs, [key]: value }
+    updatePrefsMutation.mutate(newPrefs)
+  }
 
   const passwordForm = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -110,7 +113,7 @@ export default function SettingsPage() {
         description="Manage your account settings and preferences"
       />
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
@@ -329,76 +332,82 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Notification Preferences</CardTitle>
               <CardDescription>
-                Configure how you receive alerts and notifications
+                Configure how you receive alerts and notifications. Changes are saved automatically.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="critical-alerts">Critical Alerts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications for critical system issues
-                  </p>
+              {isLoadingPrefs ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
-                <Switch
-                  id="critical-alerts"
-                  checked={notificationPrefs.criticalAlerts}
-                  onCheckedChange={(checked) => handleNotificationChange('criticalAlerts', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="security-alerts">Security Alerts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifications for security-related events
-                  </p>
-                </div>
-                <Switch
-                  id="security-alerts"
-                  checked={notificationPrefs.securityAlerts}
-                  onCheckedChange={(checked) => handleNotificationChange('securityAlerts', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="daily-summary">Daily Summary</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive a daily summary of platform activity
-                  </p>
-                </div>
-                <Switch
-                  id="daily-summary"
-                  checked={notificationPrefs.dailySummary}
-                  onCheckedChange={(checked) => handleNotificationChange('dailySummary', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications via email
-                  </p>
-                </div>
-                <Switch
-                  id="email-notifications"
-                  checked={notificationPrefs.emailNotifications}
-                  onCheckedChange={(checked) => handleNotificationChange('emailNotifications', checked)}
-                />
-              </div>
+              ) : notificationPrefs ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="critical-alerts">Critical Alerts</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive notifications for critical system issues
+                      </p>
+                    </div>
+                    <Switch
+                      id="critical-alerts"
+                      checked={notificationPrefs.criticalAlerts}
+                      onCheckedChange={(checked) => handleNotificationChange('criticalAlerts', checked)}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="security-alerts">Security Alerts</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Notifications for security-related events
+                      </p>
+                    </div>
+                    <Switch
+                      id="security-alerts"
+                      checked={notificationPrefs.securityAlerts}
+                      onCheckedChange={(checked) => handleNotificationChange('securityAlerts', checked)}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="daily-summary">Daily Summary</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive a daily summary of platform activity
+                      </p>
+                    </div>
+                    <Switch
+                      id="daily-summary"
+                      checked={notificationPrefs.dailySummary}
+                      onCheckedChange={(checked) => handleNotificationChange('dailySummary', checked)}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="email-notifications">Email Notifications</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive notifications via email
+                      </p>
+                    </div>
+                    <Switch
+                      id="email-notifications"
+                      checked={notificationPrefs.emailNotifications}
+                      onCheckedChange={(checked) => handleNotificationChange('emailNotifications', checked)}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground text-center py-4">
+                  Failed to load notification preferences
+                </p>
+              )}
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleSaveNotifications} disabled={isSavingNotifications}>
-                {isSavingNotifications ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save Preferences
-              </Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>

@@ -17,6 +17,7 @@ interface AdminAuthState {
   verifyMfa: (code: string) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => Promise<void>
+  clearAuth: () => void
   clearError: () => void
   hasPermission: (permission: AdminPermission | string) => boolean
   hasAnyPermission: (permissions: (AdminPermission | string)[]) => boolean
@@ -87,6 +88,8 @@ export const useAdminAuthStore = create<AdminAuthState>()(
           set({ adminUser: null, isAuthenticated: false, isMfaVerified: false, isLoading: false })
         }
       },
+
+      clearAuth: () => set({ adminUser: null, isAuthenticated: false, isMfaVerified: false, mfaSessionToken: null, error: null }),
 
       clearError: () => set({ error: null }),
 

@@ -41,12 +41,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { ContentEditorDialog } from './_components/content-editor-dialog'
+import { ContentPreviewDialog } from './_components/content-preview-dialog'
 
 type ContentType = 'faq' | 'help_article' | 'notice_template'
 
 export default function ContentPage() {
   const [activeTab, setActiveTab] = useState<ContentType>('faq')
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [previewId, setPreviewId] = useState<string | null>(null)
 
   const { data: contentData, isLoading, error } = useContent({
     contentType: activeTab,
@@ -70,6 +75,20 @@ export default function ContentPage() {
       deleteMutation.mutate(deleteId)
       setDeleteId(null)
     }
+  }
+
+  const handleCreate = () => {
+    setEditingId(null)
+    setEditorOpen(true)
+  }
+
+  const handleEdit = (id: string) => {
+    setEditingId(id)
+    setEditorOpen(true)
+  }
+
+  const handlePreview = (id: string) => {
+    setPreviewId(id)
   }
 
   const getStatusBadge = (status: string) => {
@@ -180,10 +199,22 @@ export default function ContentPage() {
               </div>
               <RequirePermission permission={ADMIN_PERMISSIONS.CONTENT_EDIT}>
                 <div className="flex gap-1 ml-4">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Preview">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    title="Preview"
+                    onClick={() => handlePreview(item.id)}
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    title="Edit"
+                    onClick={() => handleEdit(item.id)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   {item.status === 'draft' && (
@@ -236,7 +267,7 @@ export default function ContentPage() {
           description="Manage FAQs, help articles, and notification templates"
         />
         <RequirePermission permission={ADMIN_PERMISSIONS.CONTENT_EDIT}>
-          <Button>
+          <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Add Content
           </Button>
@@ -270,7 +301,7 @@ export default function ContentPage() {
                   </CardDescription>
                 </div>
                 <RequirePermission permission={ADMIN_PERMISSIONS.CONTENT_EDIT}>
-                  <Button size="sm">
+                  <Button size="sm" onClick={handleCreate}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add FAQ
                   </Button>
@@ -294,7 +325,7 @@ export default function ContentPage() {
                   </CardDescription>
                 </div>
                 <RequirePermission permission={ADMIN_PERMISSIONS.CONTENT_EDIT}>
-                  <Button size="sm">
+                  <Button size="sm" onClick={handleCreate}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Article
                   </Button>
@@ -318,7 +349,7 @@ export default function ContentPage() {
                   </CardDescription>
                 </div>
                 <RequirePermission permission={ADMIN_PERMISSIONS.CONTENT_EDIT}>
-                  <Button size="sm">
+                  <Button size="sm" onClick={handleCreate}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Template
                   </Button>
@@ -351,6 +382,19 @@ export default function ContentPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ContentEditorDialog
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        contentId={editingId}
+        defaultContentType={activeTab}
+      />
+
+      <ContentPreviewDialog
+        open={!!previewId}
+        onOpenChange={(open) => !open && setPreviewId(null)}
+        contentId={previewId}
+      />
     </div>
   )
 }

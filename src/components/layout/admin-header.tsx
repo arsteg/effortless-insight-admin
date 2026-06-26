@@ -30,9 +30,10 @@ export function AdminHeader() {
   const router = useRouter()
   const { adminUser, logout } = useAdminAuthStore()
 
-  const handleLogout = async () => {
-    await logout()
-    router.push('/login')
+  const handleLogout = () => {
+    logout().then(() => {
+      router.push('/login')
+    })
   }
 
   const getInitials = (name: string) => {
@@ -70,20 +71,22 @@ export function AdminHeader() {
         </Button>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={adminUser?.avatarUrl} alt={adminUser?.name} />
-              <AvatarFallback>
-                {adminUser?.name ? getInitials(adminUser.name) : 'AD'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden md:flex flex-col items-start">
-              <span className="text-sm font-medium">{adminUser?.name}</span>
-              <Badge variant="secondary" className="text-[10px] h-4 px-1">
-                {adminUser?.role ? ADMIN_ROLE_LABELS[adminUser.role] : 'Admin'}
-              </Badge>
-            </div>
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={adminUser?.avatarUrl} alt={adminUser?.name} />
+                <AvatarFallback>
+                  {adminUser?.name ? getInitials(adminUser.name) : 'AD'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden md:flex flex-col items-start">
+                <span className="text-sm font-medium">{adminUser?.name}</span>
+                <Badge variant="secondary" className="text-[10px] h-4 px-1">
+                  {adminUser?.role ? ADMIN_ROLE_LABELS[adminUser.role] : 'Admin'}
+                </Badge>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
@@ -95,16 +98,16 @@ export function AdminHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
+            <DropdownMenuItem onSelect={() => router.push('/settings?tab=profile')}>
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push('/settings')}>
+            <DropdownMenuItem onSelect={() => router.push('/settings?tab=security')}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+            <DropdownMenuItem onSelect={handleLogout} className="text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>

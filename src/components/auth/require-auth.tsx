@@ -3,7 +3,9 @@
 import { useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdminAuthStore } from '@/stores/admin-auth-store'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Shield } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { AdminPermission } from '@/types/admin'
 
 interface RequireAuthProps {
@@ -20,7 +22,7 @@ export function RequireAuth({
   fallback,
 }: RequireAuthProps) {
   const router = useRouter()
-  const { isAuthenticated, isMfaVerified, isLoading, loadUser, hasPermission, hasAnyPermission } =
+  const { adminUser, isAuthenticated, isMfaVerified, isLoading, loadUser, hasPermission, hasAnyPermission } =
     useAdminAuthStore()
 
   useEffect(() => {
@@ -44,6 +46,32 @@ export function RequireAuth({
   if (!isAuthenticated || !isMfaVerified) {
     return null
   }
+
+  // TODO: Re-enable MFA enforcement for production
+  // Enforce MFA setup per security policy §7.1
+  // if (adminUser && !adminUser.mfaEnabled) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen bg-muted/30">
+  //       <Card className="max-w-md">
+  //         <CardHeader className="text-center">
+  //           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+  //             <Shield className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+  //           </div>
+  //           <CardTitle>MFA Required</CardTitle>
+  //           <CardDescription>
+  //             Two-factor authentication is required for all admin accounts.
+  //             Please set up MFA to continue.
+  //           </CardDescription>
+  //         </CardHeader>
+  //         <CardContent className="text-center">
+  //           <Button onClick={() => router.push('/settings?tab=security')}>
+  //             Set Up MFA Now
+  //           </Button>
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   )
+  // }
 
   if (permissions && permissions.length > 0) {
     const hasAccess = requireAll

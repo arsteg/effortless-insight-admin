@@ -44,6 +44,21 @@ export const adminAuthApi = {
   disableMfa: async (password: string, code: string): Promise<void> => {
     await adminClient.post('/admin/auth/mfa/disable', { password, code })
   },
+  getNotificationPreferences: async (): Promise<NotificationPreferences> => {
+    const response = await adminClient.get('/admin/auth/notification-preferences')
+    return extractData(response)
+  },
+  updateNotificationPreferences: async (prefs: NotificationPreferences): Promise<NotificationPreferences> => {
+    const response = await adminClient.put('/admin/auth/notification-preferences', prefs)
+    return extractData(response)
+  },
+}
+
+export interface NotificationPreferences {
+  criticalAlerts: boolean
+  securityAlerts: boolean
+  dailySummary: boolean
+  emailNotifications: boolean
 }
 
 export const adminDashboardApi = {
@@ -398,35 +413,35 @@ export const adminContentApi = {
     page?: number
     pageSize?: number
   }): Promise<PaginatedResponse<ContentPage>> => {
-    const response = await adminClient.get('/admin/v1/content', { params })
+    const response = await adminClient.get('/admin/content', { params })
     const data = extractData<BackendPaginatedResponse<ContentPage>>(response)
     return transformPaginatedResponse(data)
   },
   get: async (id: string): Promise<ContentPage> => {
-    const response = await adminClient.get(`/admin/v1/content/${id}`)
+    const response = await adminClient.get(`/admin/content/${id}`)
     return extractData(response)
   },
   create: async (data: CreateContentRequest): Promise<ContentPage> => {
-    const response = await adminClient.post('/admin/v1/content', data)
+    const response = await adminClient.post('/admin/content', data)
     return extractData(response)
   },
   update: async (id: string, data: UpdateContentRequest): Promise<ContentPage> => {
-    const response = await adminClient.put(`/admin/v1/content/${id}`, data)
+    const response = await adminClient.put(`/admin/content/${id}`, data)
     return extractData(response)
   },
   publish: async (id: string): Promise<ContentPage> => {
-    const response = await adminClient.post(`/admin/v1/content/${id}/publish`)
+    const response = await adminClient.post(`/admin/content/${id}/publish`)
     return extractData(response)
   },
   archive: async (id: string): Promise<ContentPage> => {
-    const response = await adminClient.post(`/admin/v1/content/${id}/archive`)
+    const response = await adminClient.post(`/admin/content/${id}/archive`)
     return extractData(response)
   },
   delete: async (id: string): Promise<void> => {
-    await adminClient.delete(`/admin/v1/content/${id}`)
+    await adminClient.delete(`/admin/content/${id}`)
   },
   getCategories: async (contentType?: string): Promise<string[]> => {
-    const response = await adminClient.get('/admin/v1/content/categories', { params: { contentType } })
+    const response = await adminClient.get('/admin/content/categories', { params: { contentType } })
     return extractData(response)
   },
 }
