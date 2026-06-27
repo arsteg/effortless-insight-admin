@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
-import { MoreHorizontal, Eye, UserX, UserCheck, Key, Trash2, Users as UsersIcon } from 'lucide-react'
+import { MoreHorizontal, Eye, UserX, UserCheck, Key, Trash2, Users as UsersIcon, CheckSquare, Square, MinusSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -51,6 +51,67 @@ export default function UsersPage() {
   const [impersonateUser, setImpersonateUser] = useState<AdminUserListItem | null>(null)
   const [deleteUser, setDeleteUser] = useState<AdminUserListItem | null>(null)
 
+  // Bulk selection state
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set())
+
+  // Bulk selection helpers
+  const currentPageUsers = data?.items ?? []
+  const allSelected = currentPageUsers.length > 0 && currentPageUsers.every(u => selectedUsers.has(u.id))
+  const someSelected = currentPageUsers.some(u => selectedUsers.has(u.id))
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      // Deselect all on current page
+      const newSelected = new Set(selectedUsers)
+      currentPageUsers.forEach(u => newSelected.delete(u.id))
+      setSelectedUsers(newSelected)
+    } else {
+      // Select all on current page
+      const newSelected = new Set(selectedUsers)
+      currentPageUsers.forEach(u => newSelected.add(u.id))
+      setSelectedUsers(newSelected)
+    }
+  }
+
+  const toggleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUsers)
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId)
+    } else {
+      newSelected.add(userId)
+    }
+    setSelectedUsers(newSelected)
+  }
+
+  const clearSelection = () => {
+    setSelectedUsers(new Set())
+  }
+
+  const handleBulkSuspend = () => {
+    // For each selected user that's not already suspended
+    const toSuspend = currentPageUsers.filter(u => selectedUsers.has(u.id) && u.status !== 'suspended')
+    if (toSuspend.length > 0) {
+      // Open the first one in suspension dialog, after completion trigger next
+      setSuspendUser(toSuspend[0])
+    }
+  }
+
+  const handleBulkUnsuspend = () => {
+    // Unsuspend all selected suspended users
+    currentPageUsers
+      .filter(u => selectedUsers.has(u.id) && u.status === 'suspended')
+      .forEach(u => unsuspendMutation.mutate(u.id))
+    clearSelection()
+  }
+
+  const handleBulkResetPassword = () => {
+    // Reset password for all selected users
+    currentPageUsers
+      .filter(u => selectedUsers.has(u.id))
+      .forEach(u => resetPasswordMutation.mutate(u.id))
+    clearSelection()
+  }
+
   // Fetch organizations for filter dropdown
   const { data: organizationsData } = useOrganizations({ pageSize: 100 })
 
@@ -67,6 +128,41 @@ export default function UsersPage() {
   const resetPasswordMutation = useResetUserPassword()
 
   const columns: Column<AdminUserListItem>[] = [
+    {
+      key: 'select',
+      header: () => (
+        <button
+          onClick={toggleSelectAll}
+          className="flex items-center justify-center h-4 w-4"
+          aria-label="Select all users"
+        >
+          {allSelected ? (
+            <CheckSquare className="h-4 w-4 text-primary" />
+          ) : someSelected ? (
+            <MinusSquare className="h-4 w-4 text-primary" />
+          ) : (
+            <Square className="h-4 w-4 text-muted-foreground" />
+          )}
+        </button>
+      ),
+      className: 'w-[40px]',
+      cell: (user) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleSelectUser(user.id)
+          }}
+          className="flex items-center justify-center h-4 w-4"
+          aria-label={`Select ${user.name}`}
+        >
+          {selectedUsers.has(user.id) ? (
+            <CheckSquare className="h-4 w-4 text-primary" />
+          ) : (
+            <Square className="h-4 w-4 text-muted-foreground" />
+          )}
+        </button>
+      ),
+    },
     {
       key: 'name',
       header: 'User',
@@ -250,6 +346,54 @@ export default function UsersPage() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedUsers.size > 0 && (
+        <div className="flex items-center gap-4 p-3 bg-muted rounded-lg">
+          <span className="text-sm font-medium">
+            {selectedUsers.size} user{selectedUsers.size !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex gap-2">
+            <RequirePermission permission={ADMIN_PERMISSIONS.USERS_SUSPEND}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkSuspend}
+              >
+                <UserX className="mr-2 h-4 w-4" />
+                Suspend Selected
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkUnsuspend}
+              >
+                <UserCheck className="mr-2 h-4 w-4" />
+                Unsuspend Selected
+              </Button>
+            </RequirePermission>
+            <RequirePermission permission={ADMIN_PERMISSIONS.USERS_RESET_PASSWORD}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkResetPassword}
+                disabled={resetPasswordMutation.isPending}
+              >
+                <Key className="mr-2 h-4 w-4" />
+                Reset Passwords
+              </Button>
+            </RequirePermission>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearSelection}
+            className="ml-auto"
+          >
+            Clear Selection
+          </Button>
+        </div>
+      )}
 
       <DataTable
         columns={columns}
