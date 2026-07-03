@@ -54,6 +54,21 @@ export default function UsersPage() {
   // Bulk selection state
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set())
 
+  // Fetch organizations for filter dropdown
+  const { data: organizationsData } = useOrganizations({ pageSize: 100 })
+
+  const { data, isLoading } = useUsers({
+    search: search || undefined,
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    plan: planFilter !== 'all' ? planFilter : undefined,
+    organizationId: organizationFilter !== 'all' ? organizationFilter : undefined,
+    page,
+    pageSize,
+  })
+
+  const unsuspendMutation = useUnsuspendUser()
+  const resetPasswordMutation = useResetUserPassword()
+
   // Bulk selection helpers
   const currentPageUsers = data?.items ?? []
   const allSelected = currentPageUsers.length > 0 && currentPageUsers.every(u => selectedUsers.has(u.id))
@@ -111,21 +126,6 @@ export default function UsersPage() {
       .forEach(u => resetPasswordMutation.mutate(u.id))
     clearSelection()
   }
-
-  // Fetch organizations for filter dropdown
-  const { data: organizationsData } = useOrganizations({ pageSize: 100 })
-
-  const { data, isLoading } = useUsers({
-    search: search || undefined,
-    status: statusFilter !== 'all' ? statusFilter : undefined,
-    plan: planFilter !== 'all' ? planFilter : undefined,
-    organizationId: organizationFilter !== 'all' ? organizationFilter : undefined,
-    page,
-    pageSize,
-  })
-
-  const unsuspendMutation = useUnsuspendUser()
-  const resetPasswordMutation = useResetUserPassword()
 
   const columns: Column<AdminUserListItem>[] = [
     {

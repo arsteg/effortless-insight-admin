@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils'
 
 export interface Column<T> {
   key: string
-  header: string
+  header: string | (() => React.ReactNode)
   cell: (item: T) => React.ReactNode
   sortable?: boolean
   className?: string
@@ -132,7 +132,7 @@ export function DataTable<T>({
                   onClick={() => column.sortable && onSort?.(column.key)}
                 >
                   <div className="flex items-center gap-2">
-                    {column.header}
+                    {typeof column.header === 'function' ? column.header() : column.header}
                     {column.sortable && sortBy === column.key && (
                       <span className="text-xs">{sortDesc ? '↓' : '↑'}</span>
                     )}

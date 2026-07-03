@@ -180,7 +180,7 @@ export function ContentEditorDialog({
                     <Label htmlFor="contentType">Content Type</Label>
                     <Select
                       value={form.watch('contentType')}
-                      onValueChange={(value) => form.setValue('contentType', value)}
+                      onValueChange={(value) => value && form.setValue('contentType', value)}
                       disabled={isEditing}
                     >
                       <SelectTrigger>
