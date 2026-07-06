@@ -8,7 +8,7 @@ jest.mock('next/navigation', () => ({
     prefetch: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
-  }),
+  }), 
   usePathname: () => '/dashboard',
   useSearchParams: () => new URLSearchParams(),
 }))
