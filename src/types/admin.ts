@@ -421,6 +421,124 @@ export interface AdminInvoiceListItem {
 }
 
 // ============================================================================
+// Admin Plan Management Types
+// ============================================================================
+
+export interface AdminPlan {
+  id: string
+  code: string
+  name: string
+  displayName: string
+  description?: string
+  pricingMonthly?: number // in paise
+  pricingAnnually?: number // in paise
+  perSeatMonthly?: number
+  perSeatAnnually?: number
+  currency: string
+  limits: PlanLimits
+  features: string[]
+  isActive: boolean
+  isPopular: boolean
+  trialDays: number
+  sortOrder: number
+  contactSales: boolean
+  startingAt?: number
+  razorpayPlanIdMonthly?: string
+  razorpayPlanIdAnnually?: string
+  subscriberCount: number
+  createdAt: string
+  updatedAt?: string
+  deletedAt?: string
+}
+
+export interface PlanLimits {
+  noticesPerMonth: number // -1 = unlimited
+  users: number // -1 = unlimited
+  storageGb: number // -1 = unlimited
+  organizationsCount: number
+  additionalUsersAllowed: boolean
+  apiCalls: number
+}
+
+export interface AdminPlanListItem {
+  id: string
+  code: string
+  name: string
+  displayName: string
+  pricingMonthly?: number
+  pricingAnnually?: number
+  currency: string
+  isActive: boolean
+  isPopular: boolean
+  sortOrder: number
+  subscriberCount: number
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface PlanSearchParams {
+  search?: string
+  isActive?: boolean
+  page?: number
+  pageSize?: number
+  sortBy?: string
+  sortDirection?: 'asc' | 'desc'
+}
+
+export interface CreatePlanRequest {
+  code: string
+  name: string
+  displayName: string
+  description?: string
+  pricingMonthly?: number
+  pricingAnnually?: number
+  perSeatMonthly?: number
+  perSeatAnnually?: number
+  currency: string
+  limits: PlanLimits
+  features: string[]
+  isActive: boolean
+  isPopular: boolean
+  trialDays: number
+  sortOrder: number
+  contactSales: boolean
+  startingAt?: number
+  razorpayPlanIdMonthly?: string
+  razorpayPlanIdAnnually?: string
+}
+
+export interface UpdatePlanRequest {
+  name?: string
+  displayName?: string
+  description?: string
+  pricingMonthly?: number
+  pricingAnnually?: number
+  perSeatMonthly?: number
+  perSeatAnnually?: number
+  currency?: string
+  limits?: PlanLimits
+  features?: string[]
+  isActive?: boolean
+  isPopular?: boolean
+  trialDays?: number
+  sortOrder?: number
+  contactSales?: boolean
+  startingAt?: number
+  razorpayPlanIdMonthly?: string
+  razorpayPlanIdAnnually?: string
+}
+
+export interface AdminPlanListResponse {
+  plans: AdminPlanListItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}
+
+// ============================================================================
 // Admin Audit Types
 // ============================================================================
 
@@ -519,6 +637,7 @@ export const ADMIN_PERMISSIONS = {
   BILLING_VIEW: 'billing:view',
   BILLING_REFUND: 'billing:refund',
   BILLING_OVERRIDE: 'billing:override',
+  PLANS_MANAGE: 'plans:manage',
 
   // AI Operations
   AI_OPS_VIEW: 'ai:view',

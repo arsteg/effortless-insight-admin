@@ -6,7 +6,8 @@ import type {
   AdminOrganizationListItem, AdminOrganizationSearchParams, AdminOrganizationDetail,
   AdminCreditInfo, BillingOverview, AdminSubscriptionListItem, AdminSubscriptionSearchParams,
   AdminSubscriptionDetail, AdminInvoiceListItem, AuditSearchParams, AuditSearchResult,
-  AuditStats, PaginatedResponse, AdminUser, AdminUserDetail,
+  AuditStats, PaginatedResponse, AdminUser, AdminUserDetail, AdminPlan, AdminPlanListItem,
+  PlanSearchParams, CreatePlanRequest, UpdatePlanRequest,
 } from '@/types/admin'
 
 export const adminAuthApi = {
@@ -95,12 +96,13 @@ interface BackendPaginatedResponse<T> {
   invoices?: T[];
   jobs?: T[];
   pages?: T[];
+  plans?: T[];
   pagination: { page: number; pageSize: number; total: number; totalPages: number }
 }
 
 // Helper to transform backend paginated response to frontend format
 function transformPaginatedResponse<T>(data: BackendPaginatedResponse<T>): PaginatedResponse<T> {
-  const items = data.users || data.organizations || data.admins || data.subscriptions || data.invoices || data.jobs || data.pages || []
+  const items = data.users || data.organizations || data.admins || data.subscriptions || data.invoices || data.jobs || data.pages || data.plans || []
   return {
     items: items as T[],
     totalCount: data.pagination.total,
@@ -198,6 +200,37 @@ export const adminBillingApi = {
     const response = await adminClient.get('/admin/billing/invoices', { params })
     const data = extractData<BackendPaginatedResponse<AdminInvoiceListItem>>(response)
     return transformPaginatedResponse(data)
+  },
+}
+
+export const adminPlansApi = {
+  list: async (params?: PlanSearchParams): Promise<PaginatedResponse<AdminPlanListItem>> => {
+    const response = await adminClient.get('/admin/plans', { params })
+    const data = extractData<BackendPaginatedResponse<AdminPlanListItem>>(response)
+    return transformPaginatedResponse(data)
+  },
+  get: async (planId: string): Promise<AdminPlan> => {
+    const response = await adminClient.get(`/admin/plans/${planId}`)
+    return extractData(response)
+  },
+  create: async (data: CreatePlanRequest): Promise<AdminPlan> => {
+    const response = await adminClient.post('/admin/plans', data)
+    return extractData(response)
+  },
+  update: async (planId: string, data: UpdatePlanRequest): Promise<AdminPlan> => {
+    const response = await adminClient.put(`/admin/plans/${planId}`, data)
+    return extractData(response)
+  },
+  delete: async (planId: string): Promise<void> => {
+    await adminClient.delete(`/admin/plans/${planId}`)
+  },
+  activate: async (planId: string): Promise<AdminPlan> => {
+    const response = await adminClient.patch(`/admin/plans/${planId}/activate`)
+    return extractData(response)
+  },
+  deactivate: async (planId: string): Promise<AdminPlan> => {
+    const response = await adminClient.patch(`/admin/plans/${planId}/deactivate`)
+    return extractData(response)
   },
 }
 
@@ -452,6 +485,7 @@ export const adminApi = {
   users: adminUsersApi,
   organizations: adminOrganizationsApi,
   billing: adminBillingApi,
+  plans: adminPlansApi,
   audit: adminAuditApi,
   management: adminManagementApi,
   aiOps: adminAiOpsApi,

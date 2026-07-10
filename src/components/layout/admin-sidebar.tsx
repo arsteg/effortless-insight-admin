@@ -18,6 +18,7 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -56,6 +57,12 @@ const mainNavItems: NavItem[] = [
     href: '/billing',
     icon: CreditCard,
     permission: ADMIN_PERMISSIONS.BILLING_VIEW,
+  },
+  {
+    title: 'Plans',
+    href: '/plans',
+    icon: Package,
+    permission: ADMIN_PERMISSIONS.PLANS_MANAGE,
   },
   {
     title: 'AI Operations',
