@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/common'
+import { QRCodeSVG } from 'qrcode.react'
 import { useAdminAuthStore } from '@/stores/admin-auth-store'
 import { useAdminAuth, useMfaSetup } from '@/hooks/use-admin-auth'
 import { adminAuthApi, type NotificationPreferences } from '@/lib/api/admin'
@@ -203,10 +204,11 @@ export default function SettingsPage() {
               {showMfaSetup && mfaSetup.setupData ? (
                 <div className="space-y-4">
                   <div className="flex flex-col items-center gap-4 p-4 rounded-lg border bg-muted/50">
-                    <img
-                      src={mfaSetup.setupData.qrCodeUri}
-                      alt="MFA QR Code"
-                      className="h-48 w-48"
+                    <QRCodeSVG
+                      value={mfaSetup.setupData.qrCodeUri}
+                      size={192}
+                      level="M"
+                      includeMargin
                     />
                     <p className="text-sm text-muted-foreground text-center">
                       Scan this QR code with your authenticator app

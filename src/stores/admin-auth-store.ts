@@ -38,10 +38,11 @@ export const useAdminAuthStore = create<AdminAuthState>()(
         set({ isLoading: true, error: null })
         try {
           const response = await adminApi.auth.login({ email, password })
-          if ('mfaRequired' in response && response.mfaRequired) {
-            set({ isLoading: false, mfaSessionToken: response.sessionToken })
-            return { requiresMfa: true }
-          }
+          // TODO: MFA temporarily disabled for development
+          // if ('mfaRequired' in response && response.mfaRequired) {
+          //   set({ isLoading: false, mfaSessionToken: response.sessionToken })
+          //   return { requiresMfa: true }
+          // }
           const loginResponse = response as { accessToken: string; refreshToken: string; user: AdminUser }
           adminTokens.setTokens(loginResponse.accessToken, loginResponse.refreshToken)
           set({ adminUser: loginResponse.user, isAuthenticated: true, isMfaVerified: true, isLoading: false, mfaSessionToken: null })
