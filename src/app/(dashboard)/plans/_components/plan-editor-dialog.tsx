@@ -44,34 +44,34 @@ const planSchema = z.object({
   description: z.string().optional(),
 
   // Pricing (in rupees, will be converted to paise)
-  pricingMonthly: z.number().min(0, 'Monthly price must be positive').optional().nullable(),
-  pricingAnnually: z.number().min(0, 'Annual price must be positive').optional().nullable(),
-  perSeatMonthly: z.number().min(0, 'Per-seat monthly price must be positive').optional().nullable(),
-  perSeatAnnually: z.number().min(0, 'Per-seat annual price must be positive').optional().nullable(),
-  currency: z.string().default('INR'),
-  contactSales: z.boolean().default(false),
-  startingAt: z.number().min(0, 'Starting price must be positive').optional().nullable(),
+  pricingMonthly: z.number().min(0, 'Monthly price must be positive').optional(),
+  pricingAnnually: z.number().min(0, 'Annual price must be positive').optional(),
+  perSeatMonthly: z.number().min(0, 'Per-seat monthly price must be positive').optional(),
+  perSeatAnnually: z.number().min(0, 'Per-seat annual price must be positive').optional(),
+  currency: z.string(),
+  contactSales: z.boolean(),
+  startingAt: z.number().min(0, 'Starting price must be positive').optional(),
 
   // Razorpay IDs
-  razorpayPlanIdMonthly: z.string().optional().nullable(),
-  razorpayPlanIdAnnually: z.string().optional().nullable(),
+  razorpayPlanIdMonthly: z.string().optional(),
+  razorpayPlanIdAnnually: z.string().optional(),
 
   // Limits
   noticesPerMonth: z.number().int().min(0, 'Notices must be 0 or positive'),
   users: z.number().int().min(0, 'Users must be 0 or positive'),
   storageGb: z.number().int().min(0, 'Storage must be 0 or positive'),
-  organizationsCount: z.number().int().min(1, 'Must allow at least 1 organization').default(1),
-  additionalUsersAllowed: z.boolean().default(false),
-  apiCalls: z.number().int().min(0, 'API calls must be 0 or positive').default(10000),
+  organizationsCount: z.number().int().min(1, 'Must allow at least 1 organization'),
+  additionalUsersAllowed: z.boolean(),
+  apiCalls: z.number().int().min(0, 'API calls must be 0 or positive'),
 
   // Features
-  features: z.array(z.string()).default([]),
+  features: z.array(z.string()),
 
   // Settings
-  isActive: z.boolean().default(true),
-  isPopular: z.boolean().default(false),
-  trialDays: z.number().int().min(0).default(14),
-  sortOrder: z.number().int().min(0).default(0),
+  isActive: z.boolean(),
+  isPopular: z.boolean(),
+  trialDays: z.number().int().min(0),
+  sortOrder: z.number().int().min(0),
 })
 
 type PlanFormData = z.infer<typeof planSchema>
@@ -106,15 +106,15 @@ export function PlanEditorDialog({
       name: '',
       displayName: '',
       description: '',
-      pricingMonthly: null,
-      pricingAnnually: null,
-      perSeatMonthly: null,
-      perSeatAnnually: null,
+      pricingMonthly: undefined,
+      pricingAnnually: undefined,
+      perSeatMonthly: undefined,
+      perSeatAnnually: undefined,
       currency: 'INR',
       contactSales: false,
-      startingAt: null,
-      razorpayPlanIdMonthly: null,
-      razorpayPlanIdAnnually: null,
+      startingAt: undefined,
+      razorpayPlanIdMonthly: undefined,
+      razorpayPlanIdAnnually: undefined,
       noticesPerMonth: 100,
       users: 5,
       storageGb: 10,
@@ -142,15 +142,15 @@ export function PlanEditorDialog({
         name: existingPlan.name,
         displayName: existingPlan.displayName,
         description: existingPlan.description || '',
-        pricingMonthly: existingPlan.pricingMonthly ? existingPlan.pricingMonthly / 100 : null,
-        pricingAnnually: existingPlan.pricingAnnually ? existingPlan.pricingAnnually / 100 : null,
-        perSeatMonthly: existingPlan.perSeatMonthly ? existingPlan.perSeatMonthly / 100 : null,
-        perSeatAnnually: existingPlan.perSeatAnnually ? existingPlan.perSeatAnnually / 100 : null,
+        pricingMonthly: existingPlan.pricingMonthly ? existingPlan.pricingMonthly / 100 : undefined,
+        pricingAnnually: existingPlan.pricingAnnually ? existingPlan.pricingAnnually / 100 : undefined,
+        perSeatMonthly: existingPlan.perSeatMonthly ? existingPlan.perSeatMonthly / 100 : undefined,
+        perSeatAnnually: existingPlan.perSeatAnnually ? existingPlan.perSeatAnnually / 100 : undefined,
         currency: existingPlan.currency,
         contactSales: existingPlan.contactSales,
-        startingAt: existingPlan.startingAt ? existingPlan.startingAt / 100 : null,
-        razorpayPlanIdMonthly: existingPlan.razorpayPlanIdMonthly || null,
-        razorpayPlanIdAnnually: existingPlan.razorpayPlanIdAnnually || null,
+        startingAt: existingPlan.startingAt ? existingPlan.startingAt / 100 : undefined,
+        razorpayPlanIdMonthly: existingPlan.razorpayPlanIdMonthly || undefined,
+        razorpayPlanIdAnnually: existingPlan.razorpayPlanIdAnnually || undefined,
         noticesPerMonth: existingPlan.limits.noticesPerMonth === -1 ? 0 : existingPlan.limits.noticesPerMonth,
         users: existingPlan.limits.users === -1 ? 0 : existingPlan.limits.users,
         storageGb: existingPlan.limits.storageGb === -1 ? 0 : existingPlan.limits.storageGb,
@@ -177,15 +177,15 @@ export function PlanEditorDialog({
         name: '',
         displayName: '',
         description: '',
-        pricingMonthly: null,
-        pricingAnnually: null,
-        perSeatMonthly: null,
-        perSeatAnnually: null,
+        pricingMonthly: undefined,
+        pricingAnnually: undefined,
+        perSeatMonthly: undefined,
+        perSeatAnnually: undefined,
         currency: 'INR',
         contactSales: false,
-        startingAt: null,
-        razorpayPlanIdMonthly: null,
-        razorpayPlanIdAnnually: null,
+        startingAt: undefined,
+        razorpayPlanIdMonthly: undefined,
+        razorpayPlanIdAnnually: undefined,
         noticesPerMonth: 100,
         users: 5,
         storageGb: 10,
@@ -239,10 +239,8 @@ export function PlanEditorDialog({
     }
 
     if (isEditing && planId) {
-      const updateData: UpdatePlanRequest = {
-        ...planData,
-        code: undefined, // Code cannot be updated
-      }
+      // Code cannot be updated, so destructure it out
+      const { code, ...updateData } = planData
       await updateMutation.mutateAsync({ id: planId, data: updateData })
     } else {
       await createMutation.mutateAsync(planData)
@@ -333,8 +331,8 @@ export function PlanEditorDialog({
                   <div className="space-y-2">
                     <Label htmlFor="currency">Currency</Label>
                     <Select
-                      value={form.watch('currency')}
-                      onValueChange={(value) => form.setValue('currency', value)}
+                      value={form.watch('currency') || 'INR'}
+                      onValueChange={(value) => value && form.setValue('currency', value)}
                     >
                       <SelectTrigger>
                         <SelectValue />
