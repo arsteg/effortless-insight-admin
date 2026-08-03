@@ -99,8 +99,9 @@ export default function PlansPage() {
     }
   }
 
-  const formatPrice = (priceInPaise?: number) => {
-    if (!priceInPaise) return 'N/A'
+  const formatPrice = (priceInPaise?: number | null) => {
+    if (priceInPaise == null) return 'N/A'
+    if (priceInPaise === 0) return 'Free'
     return `₹${(priceInPaise / 100).toLocaleString('en-IN')}`
   }
 
@@ -123,17 +124,17 @@ export default function PlansPage() {
       header: 'Pricing',
       cell: (plan) => (
         <div className="flex flex-col">
-          {plan.pricingMonthly && (
+          {plan.pricingMonthly != null && (
             <span className="text-sm">
               {formatPrice(plan.pricingMonthly)}/mo
             </span>
           )}
-          {plan.pricingAnnually && (
+          {plan.pricingAnnually != null && (
             <span className="text-sm text-muted-foreground">
               {formatPrice(plan.pricingAnnually)}/yr
             </span>
           )}
-          {!plan.pricingMonthly && !plan.pricingAnnually && (
+          {plan.pricingMonthly == null && plan.pricingAnnually == null && (
             <span className="text-sm text-muted-foreground">Contact Sales</span>
           )}
         </div>

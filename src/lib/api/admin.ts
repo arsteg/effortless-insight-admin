@@ -88,6 +88,7 @@ export const adminDashboardApi = {
 }
 
 // Backend paginated response structure
+// Note: Backend returns totalRecords (not total) in the pagination object
 interface BackendPaginatedResponse<T> {
   users?: T[];
   organizations?: T[];
@@ -97,7 +98,7 @@ interface BackendPaginatedResponse<T> {
   jobs?: T[];
   pages?: T[];
   plans?: T[];
-  pagination: { page: number; pageSize: number; total: number; totalPages: number }
+  pagination: { page: number; pageSize: number; totalRecords: number; totalPages: number }
 }
 
 // Helper to transform backend paginated response to frontend format
@@ -105,7 +106,7 @@ function transformPaginatedResponse<T>(data: BackendPaginatedResponse<T>): Pagin
   const items = data.users || data.organizations || data.admins || data.subscriptions || data.invoices || data.jobs || data.pages || data.plans || []
   return {
     items: items as T[],
-    totalCount: data.pagination.total,
+    totalCount: data.pagination.totalRecords,
     page: data.pagination.page,
     pageSize: data.pagination.pageSize,
     totalPages: data.pagination.totalPages,

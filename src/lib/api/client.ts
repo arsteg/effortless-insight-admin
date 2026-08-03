@@ -78,7 +78,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 
 adminClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
+  async (error: AxiosError<{ message?: string; error?: string; title?: string }>) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && originalRequest) {
       if (isRefreshing) {
@@ -119,7 +119,18 @@ adminClient.interceptors.response.use(
         isRefreshing = false;
       }
     }
-    return Promise.reject(error);
+
+    // Extract error message from various response formats
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.data?.title ||
+      error.message ||
+      'An unexpected error occurred';
+
+    // Create a proper Error with the server message
+    const apiError = new Error(errorMessage);
+    return Promise.reject(apiError);
   },
 );
 

@@ -364,6 +364,9 @@ export function PlanEditorDialog({
                       {...form.register('pricingMonthly', { valueAsNumber: true })}
                       placeholder="999"
                     />
+                    {form.formState.errors.pricingMonthly && (
+                      <p className="text-sm text-destructive">{form.formState.errors.pricingMonthly.message}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">Leave empty for enterprise plans</p>
                   </div>
 
@@ -375,6 +378,9 @@ export function PlanEditorDialog({
                       {...form.register('pricingAnnually', { valueAsNumber: true })}
                       placeholder="9990"
                     />
+                    {form.formState.errors.pricingAnnually && (
+                      <p className="text-sm text-destructive">{form.formState.errors.pricingAnnually.message}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">Typically 10 months worth (2 months free)</p>
                   </div>
 
@@ -386,6 +392,9 @@ export function PlanEditorDialog({
                       {...form.register('perSeatMonthly', { valueAsNumber: true })}
                       placeholder="499"
                     />
+                    {form.formState.errors.perSeatMonthly && (
+                      <p className="text-sm text-destructive">{form.formState.errors.perSeatMonthly.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -396,6 +405,9 @@ export function PlanEditorDialog({
                       {...form.register('perSeatAnnually', { valueAsNumber: true })}
                       placeholder="4990"
                     />
+                    {form.formState.errors.perSeatAnnually && (
+                      <p className="text-sm text-destructive">{form.formState.errors.perSeatAnnually.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -455,6 +467,9 @@ export function PlanEditorDialog({
                       disabled={unlimitedNotices}
                       placeholder="100"
                     />
+                    {form.formState.errors.noticesPerMonth && (
+                      <p className="text-sm text-destructive">{form.formState.errors.noticesPerMonth.message}</p>
+                    )}
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="unlimitedNotices"
@@ -474,6 +489,9 @@ export function PlanEditorDialog({
                       disabled={unlimitedUsers}
                       placeholder="5"
                     />
+                    {form.formState.errors.users && (
+                      <p className="text-sm text-destructive">{form.formState.errors.users.message}</p>
+                    )}
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="unlimitedUsers"
@@ -493,6 +511,9 @@ export function PlanEditorDialog({
                       disabled={unlimitedStorage}
                       placeholder="10"
                     />
+                    {form.formState.errors.storageGb && (
+                      <p className="text-sm text-destructive">{form.formState.errors.storageGb.message}</p>
+                    )}
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="unlimitedStorage"
@@ -511,6 +532,9 @@ export function PlanEditorDialog({
                       {...form.register('organizationsCount', { valueAsNumber: true })}
                       placeholder="1"
                     />
+                    {form.formState.errors.organizationsCount && (
+                      <p className="text-sm text-destructive">{form.formState.errors.organizationsCount.message}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">Usually 1 for standard plans</p>
                   </div>
 
@@ -522,6 +546,9 @@ export function PlanEditorDialog({
                       {...form.register('apiCalls', { valueAsNumber: true })}
                       placeholder="10000"
                     />
+                    {form.formState.errors.apiCalls && (
+                      <p className="text-sm text-destructive">{form.formState.errors.apiCalls.message}</p>
+                    )}
                   </div>
 
                   <div className="flex items-center space-x-2 pt-6">

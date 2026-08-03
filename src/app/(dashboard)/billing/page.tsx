@@ -37,13 +37,15 @@ export default function BillingPage() {
   const [period, setPeriod] = useState('30d')
   const { data: overview, isLoading, refetch } = useBillingOverview(period)
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amountInPaise: number) => {
+    // Convert paise to rupees before formatting
+    const amountInRupees = amountInPaise / 100
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       notation: 'compact',
       maximumFractionDigits: 1,
-    }).format(amount)
+    }).format(amountInRupees)
   }
 
   return (
