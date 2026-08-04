@@ -5,6 +5,8 @@
 export const PLAN_FEATURES = [
   { code: 'full_ai_analysis', label: 'Full AI Analysis' },
   { code: 'priority_processing', label: 'Priority Processing' },
+  { code: 'workflows', label: 'Workflows' },
+  { code: 'advanced_workflows', label: 'Advanced Workflows' },
   { code: 'advanced_analytics', label: 'Advanced Analytics' },
   { code: 'custom_reports', label: 'Custom Reports' },
   { code: 'api_access', label: 'API Access' },
