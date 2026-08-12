@@ -70,11 +70,13 @@ export function InvoicesTab() {
     pageSize,
   })
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amountInPaise: number) => {
+    // Convert paise to rupees before formatting
+    const amountInRupees = amountInPaise / 100
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-    }).format(amount)
+    }).format(amountInRupees)
   }
 
   const columns: Column<AdminInvoiceListItem>[] = [
