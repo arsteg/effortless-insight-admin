@@ -25,6 +25,7 @@ import { PageHeader, StatCard, LoadingState } from '@/components/common'
 import { useBillingOverview } from '@/hooks/use-billing'
 import { SubscriptionsTab } from './_components/subscriptions-tab'
 import { InvoicesTab } from './_components/invoices-tab'
+import { BillingSettingsTab } from './_components/billing-settings-tab'
 
 const periodOptions = [
   { value: '30d', label: 'Last 30 days' },
@@ -163,11 +164,12 @@ export default function BillingPage() {
         </Card>
       </div>
 
-      {/* Tabs for Subscriptions and Invoices */}
+      {/* Tabs for Subscriptions, Invoices, and Settings */}
       <Tabs defaultValue="subscriptions" className="space-y-4">
         <TabsList>
           <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
           <TabsTrigger value="invoices">Invoices</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="subscriptions">
@@ -176,6 +178,10 @@ export default function BillingPage() {
 
         <TabsContent value="invoices">
           <InvoicesTab />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <BillingSettingsTab />
         </TabsContent>
       </Tabs>
     </div>
