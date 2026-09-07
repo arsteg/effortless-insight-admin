@@ -7,32 +7,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { adminApi } from '@/lib/api/admin'
-
-interface BillingSettings {
-  additionalSeatsEnabled: boolean
-  trialEnabled: boolean
-  defaultTrialDays: number
-  downgradesAllowed: boolean
-}
+import { adminApi, type BillingSystemSettings } from '@/lib/api/admin'
 
 export function BillingSettingsTab() {
   const queryClient = useQueryClient()
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['admin', 'billing-settings'],
-    queryFn: async () => {
-      const response = await adminApi.get<{ data: BillingSettings }>('/system-settings/billing')
-      return response.data.data
-    },
+    queryFn: () => adminApi.systemSettings.getBillingSettings(),
     staleTime: 60000,
   })
 
   const updateMutation = useMutation({
-    mutationFn: async (updates: Partial<BillingSettings>) => {
-      const response = await adminApi.put<{ data: BillingSettings }>('/system-settings/billing', updates)
-      return response.data.data
-    },
+    mutationFn: (updates: Partial<BillingSystemSettings>) =>
+      adminApi.systemSettings.updateBillingSettings(updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'billing-settings'] })
       toast.success('Billing settings updated')
@@ -42,7 +30,7 @@ export function BillingSettingsTab() {
     },
   })
 
-  const handleToggle = (key: keyof BillingSettings, value: boolean) => {
+  const handleToggle = (key: keyof BillingSystemSettings, value: boolean) => {
     updateMutation.mutate({ [key]: value })
   }
 

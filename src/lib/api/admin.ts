@@ -480,6 +480,25 @@ export const adminContentApi = {
   },
 }
 
+// System Settings types
+export interface BillingSystemSettings {
+  additionalSeatsEnabled: boolean
+  trialEnabled: boolean
+  defaultTrialDays: number
+  downgradesAllowed: boolean
+}
+
+export const adminSystemSettingsApi = {
+  getBillingSettings: async (): Promise<BillingSystemSettings> => {
+    const response = await adminClient.get('/admin/system-settings/billing')
+    return extractData(response)
+  },
+  updateBillingSettings: async (settings: Partial<BillingSystemSettings>): Promise<BillingSystemSettings> => {
+    const response = await adminClient.put('/admin/system-settings/billing', settings)
+    return extractData(response)
+  },
+}
+
 export const adminApi = {
   auth: adminAuthApi,
   dashboard: adminDashboardApi,
@@ -491,6 +510,7 @@ export const adminApi = {
   management: adminManagementApi,
   aiOps: adminAiOpsApi,
   content: adminContentApi,
+  systemSettings: adminSystemSettingsApi,
   tokens: adminTokens,
 }
 
