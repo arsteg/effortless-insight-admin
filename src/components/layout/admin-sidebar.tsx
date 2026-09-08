@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Package,
   LifeBuoy,
+  UserPlus,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -81,6 +82,11 @@ const mainNavItems: NavItem[] = [
     title: 'Support',
     href: '/support',
     icon: LifeBuoy,
+  },
+  {
+    title: 'Incomplete Signups',
+    href: '/signups',
+    icon: UserPlus,
   },
 ]
 
