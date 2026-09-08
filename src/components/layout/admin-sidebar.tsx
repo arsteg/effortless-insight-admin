@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  LifeBuoy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -75,6 +76,11 @@ const mainNavItems: NavItem[] = [
     href: '/content',
     icon: FileText,
     permission: ADMIN_PERMISSIONS.CONTENT_VIEW,
+  },
+  {
+    title: 'Support',
+    href: '/support',
+    icon: LifeBuoy,
   },
 ]
 
