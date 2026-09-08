@@ -88,6 +88,11 @@ const mainNavItems: NavItem[] = [
     href: '/signups',
     icon: UserPlus,
   },
+  {
+    title: 'Activity',
+    href: '/activity',
+    icon: Activity,
+  },
 ]
 
 const secondaryNavItems: NavItem[] = [
