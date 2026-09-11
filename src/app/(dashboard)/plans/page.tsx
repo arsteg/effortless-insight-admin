@@ -124,6 +124,11 @@ export default function PlansPage() {
       header: 'Pricing',
       cell: (plan) => (
         <div className="flex flex-col">
+          {plan.pricingWeekly != null && plan.pricingWeekly > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {formatPrice(plan.pricingWeekly)}/wk
+            </span>
+          )}
           {plan.pricingMonthly != null && (
             <span className="text-sm">
               {formatPrice(plan.pricingMonthly)}/mo
@@ -134,10 +139,36 @@ export default function PlansPage() {
               {formatPrice(plan.pricingAnnually)}/yr
             </span>
           )}
-          {plan.pricingMonthly == null && plan.pricingAnnually == null && (
+          {plan.pricingMonthly == null && plan.pricingAnnually == null && plan.pricingWeekly == null && (
             <span className="text-sm text-muted-foreground">Contact Sales</span>
           )}
         </div>
+      ),
+    },
+    {
+      key: 'billingCycles',
+      header: 'Billing Cycles',
+      cell: (plan) => (
+        <div className="flex flex-wrap gap-1">
+          {plan.allowedBillingCycles?.map((cycle) => (
+            <Badge
+              key={cycle}
+              variant={cycle === plan.defaultBillingCycle ? 'default' : 'outline'}
+              className="text-xs"
+            >
+              {cycle === 'weekly' ? 'W' : cycle === 'monthly' ? 'M' : 'A'}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
+    {
+      key: 'limits',
+      header: 'GSTINs',
+      cell: (plan) => (
+        <span className="text-sm text-muted-foreground">
+          {plan.limits?.gstinsAllowed === -1 ? '∞' : plan.limits?.gstinsAllowed ?? '-'}
+        </span>
       ),
     },
     {
@@ -154,7 +185,7 @@ export default function PlansPage() {
       key: 'status',
       header: 'Status',
       cell: (plan) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {plan.isActive ? (
             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
               <CheckCircle className="mr-1 h-3 w-3" />
@@ -169,6 +200,11 @@ export default function PlansPage() {
           {plan.isPopular && (
             <Badge variant="outline" className="text-yellow-600 border-yellow-600">
               Popular
+            </Badge>
+          )}
+          {plan.isCaOperatorPlan && (
+            <Badge variant="outline" className="text-purple-600 border-purple-600">
+              CA Plan
             </Badge>
           )}
         </div>
