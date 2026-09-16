@@ -563,6 +563,16 @@ export const adminCasApi = {
     await adminClient.post(`/admin/cas/${caProfileId}/revoke-verification`, { reason })
   },
 
+  /** Grant a CA free access via the CA operator plan */
+  grantFreePlan: async (caProfileId: string, notes?: string): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/free-plan`, { notes })
+  },
+
+  /** Revoke a CA's free access */
+  revokeFreePlan: async (caProfileId: string, reason?: string): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/free-plan/revoke`, { reason })
+  },
+
   /** Suspend a CA account */
   suspend: async (caProfileId: string, request: AdminSuspendCaRequest): Promise<void> => {
     await adminClient.post(`/admin/cas/${caProfileId}/suspend`, request)

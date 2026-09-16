@@ -725,6 +725,7 @@ export interface AdminCaProfileListItem {
   isVerified: boolean
   verifiedAt?: string
   status: AdminCaStatus
+  allowFreePlan: boolean
   activeClientCount: number
   pendingInvitationCount: number
   createdAt: string
@@ -746,6 +747,10 @@ export interface AdminCaProfileDetail {
   suspendedAt?: string
   suspendedByAdminId?: string
   suspendedReason?: string
+  organizationId?: string
+  allowFreePlan: boolean
+  freePlanGrantedAt?: string
+  freePlanRevokedAt?: string
   activeClientCount: number
   pendingInvitationCount: number
   totalAuthorizedGstins: number
@@ -900,6 +905,14 @@ export interface AdminVerifyCaRequest {
 export interface AdminSuspendCaRequest {
   reason: string
   notes?: string
+}
+
+export interface AdminGrantCaFreePlanRequest {
+  notes?: string
+}
+
+export interface AdminRevokeCaFreePlanRequest {
+  reason?: string
 }
 
 export interface AdminCaListResponse {

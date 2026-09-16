@@ -132,6 +132,16 @@ export default function CasPage() {
       ),
     },
     {
+      key: 'freePlan',
+      header: 'Free Plan',
+      cell: (ca) =>
+        ca.allowFreePlan ? (
+          <Badge variant="default" className="bg-green-500">Enabled</Badge>
+        ) : (
+          <Badge variant="outline">Not Enabled</Badge>
+        ),
+    },
+    {
       key: 'clients',
       header: 'Clients',
       cell: (ca) => (

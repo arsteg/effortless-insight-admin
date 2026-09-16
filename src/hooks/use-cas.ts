@@ -73,6 +73,40 @@ export function useRevokeVerification() {
   })
 }
 
+export function useGrantCaFreePlan() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ caProfileId, notes }: { caProfileId: string; notes?: string }) =>
+      adminApi.cas.grantFreePlan(caProfileId, notes),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: caKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caKeys.detail(variables.caProfileId) })
+      toast.success('Free plan enabled for this CA')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to enable free plan')
+    },
+  })
+}
+
+export function useRevokeCaFreePlan() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ caProfileId, reason }: { caProfileId: string; reason?: string }) =>
+      adminApi.cas.revokeFreePlan(caProfileId, reason),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: caKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caKeys.detail(variables.caProfileId) })
+      toast.success('Free plan revoked for this CA')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to revoke free plan')
+    },
+  })
+}
+
 export function useSuspendCa() {
   const queryClient = useQueryClient()
 

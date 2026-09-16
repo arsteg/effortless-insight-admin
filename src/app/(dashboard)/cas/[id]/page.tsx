@@ -36,9 +36,19 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { RequirePermission } from '@/components/auth'
 import { ADMIN_PERMISSIONS, type AdminCaStatus } from '@/types/admin'
-import { useCaDetail, useVerifyCa, useRevokeVerification, useSuspendCa, useUnsuspendCa } from '@/hooks/use-cas'
+import {
+  useCaDetail,
+  useVerifyCa,
+  useRevokeVerification,
+  useSuspendCa,
+  useUnsuspendCa,
+  useGrantCaFreePlan,
+  useRevokeCaFreePlan,
+} from '@/hooks/use-cas'
 
 function getStatusBadge(status: AdminCaStatus) {
   switch (status) {
@@ -64,6 +74,19 @@ export default function CaDetailPage() {
   const revokeVerificationMutation = useRevokeVerification()
   const suspendMutation = useSuspendCa()
   const unsuspendMutation = useUnsuspendCa()
+  const grantFreePlanMutation = useGrantCaFreePlan()
+  const revokeFreePlanMutation = useRevokeCaFreePlan()
+
+  const isFreePlanUpdating =
+    grantFreePlanMutation.isPending || revokeFreePlanMutation.isPending
+
+  const handleFreePlanChange = (allow: boolean) => {
+    if (allow) {
+      grantFreePlanMutation.mutate({ caProfileId })
+    } else {
+      revokeFreePlanMutation.mutate({ caProfileId })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -309,6 +332,65 @@ export default function CaDetailPage() {
                           )}
                         </div>
                       </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Free plan access */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Subscription Access</CardTitle>
+                  <CardDescription>
+                    Chartered Accountants use EffortlessInsight free of charge. Enabling this
+                    puts their organization on the CA operator plan as a normal active
+                    subscription; disabling it cancels that subscription.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <RequirePermission permission={ADMIN_PERMISSIONS.USERS_SUSPEND}>
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="allowFreePlan"
+                        checked={ca.allowFreePlan}
+                        disabled={isFreePlanUpdating}
+                        onCheckedChange={(checked) => handleFreePlanChange(checked === true)}
+                      />
+                      <div className="space-y-1">
+                        <Label htmlFor="allowFreePlan" className="text-sm font-medium">
+                          Allow Free Plan for CA
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {ca.allowFreePlan
+                            ? 'This CA has free access to the application.'
+                            : 'This CA cannot access the application until the free plan is enabled or they subscribe to a paid plan.'}
+                        </p>
+                      </div>
+                    </div>
+                  </RequirePermission>
+
+                  {!ca.organizationId && (
+                    <p className="text-sm text-muted-foreground">
+                      This CA has not created an organization yet. The grant is saved now and
+                      applied automatically when they do.
+                    </p>
+                  )}
+
+                  {ca.freePlanGrantedAt && (
+                    <div className="flex justify-between py-2 text-sm">
+                      <span className="text-muted-foreground">Granted</span>
+                      <span className="font-medium">
+                        {format(new Date(ca.freePlanGrantedAt), 'MMMM d, yyyy')}
+                      </span>
+                    </div>
+                  )}
+
+                  {!ca.allowFreePlan && ca.freePlanRevokedAt && (
+                    <div className="flex justify-between py-2 text-sm">
+                      <span className="text-muted-foreground">Revoked</span>
+                      <span className="font-medium">
+                        {format(new Date(ca.freePlanRevokedAt), 'MMMM d, yyyy')}
+                      </span>
                     </div>
                   )}
                 </CardContent>
