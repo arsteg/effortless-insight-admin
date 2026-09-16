@@ -708,3 +708,226 @@ export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
   support_admin: 'Support Admin',
   content_admin: 'Content Admin',
 }
+
+// ============================================================================
+// Admin CA Management Types
+// ============================================================================
+
+export type AdminCaStatus = 'active' | 'suspended' | 'pending_verification'
+
+export interface AdminCaProfileListItem {
+  id: string
+  userId: string
+  userName: string
+  userEmail: string
+  firmName?: string
+  membershipNumber?: string
+  isVerified: boolean
+  verifiedAt?: string
+  status: AdminCaStatus
+  activeClientCount: number
+  pendingInvitationCount: number
+  createdAt: string
+}
+
+export interface AdminCaProfileDetail {
+  id: string
+  userId: string
+  userName: string
+  userEmail: string
+  userMobile?: string
+  firmName?: string
+  membershipNumber?: string
+  isVerified: boolean
+  verifiedAt?: string
+  verifiedByAdminId?: string
+  verifiedByAdminName?: string
+  status: AdminCaStatus
+  suspendedAt?: string
+  suspendedByAdminId?: string
+  suspendedReason?: string
+  activeClientCount: number
+  pendingInvitationCount: number
+  totalAuthorizedGstins: number
+  relationships: AdminCaRelationshipSummary[]
+  recentInvitations: AdminCaInvitationSummary[]
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface AdminCaRelationshipSummary {
+  id: string
+  clientUserId: string
+  clientUserName: string
+  clientUserEmail: string
+  organizationId?: string
+  organizationName?: string
+  status: string
+  gstinCount: number
+  noticeCount: number
+  invitedAt: string
+  acceptedAt?: string
+}
+
+export interface AdminCaInvitationSummary {
+  id: string
+  inviteeEmail: string
+  gstin: string
+  status: string
+  createdAt: string
+  expiresAt: string
+  respondedAt?: string
+}
+
+export interface AdminCaSearchParams {
+  search?: string
+  status?: AdminCaStatus | 'all'
+  isVerified?: boolean
+  sortBy?: string
+  sortDesc?: boolean
+  page?: number
+  pageSize?: number
+}
+
+export interface AdminCaRelationshipListItem {
+  id: string
+  caUserId: string
+  caUserName: string
+  caUserEmail: string
+  caFirmName?: string
+  clientUserId: string
+  clientUserName: string
+  clientUserEmail: string
+  organizationId?: string
+  organizationName?: string
+  status: string
+  gstinCount: number
+  noticeCount: number
+  invitedAt: string
+  acceptedAt?: string
+  revokedAt?: string
+}
+
+export interface AdminCaRelationshipDetail {
+  id: string
+  caProfile: {
+    id: string
+    userId: string
+    userName: string
+    userEmail: string
+    firmName?: string
+    isVerified: boolean
+  }
+  client: {
+    userId: string
+    userName: string
+    userEmail: string
+    organizationId?: string
+    organizationName?: string
+  }
+  status: string
+  gstinAuthorizations: AdminCaGstinAuthorization[]
+  invitedAt: string
+  acceptedAt?: string
+  revokedAt?: string
+  revokedBy?: string
+  revokeReason?: string
+  noticeCount: number
+  lastActivityAt?: string
+}
+
+export interface AdminCaGstinAuthorization {
+  id: string
+  gstin: string
+  tradeName?: string
+  legalName?: string
+  stateCode?: string
+  stateName?: string
+  status: string
+  permissions: string[]
+  grantedAt: string
+  revokedAt?: string
+  noticeCount: number
+}
+
+export interface AdminCaRelationshipSearchParams {
+  search?: string
+  caUserId?: string
+  clientUserId?: string
+  organizationId?: string
+  status?: string
+  sortBy?: string
+  sortDesc?: boolean
+  page?: number
+  pageSize?: number
+}
+
+export interface AdminCaInvitationListItem {
+  id: string
+  invitationType: string
+  caUserId: string
+  caUserName: string
+  caUserEmail: string
+  caFirmName?: string
+  inviteeEmail: string
+  gstin: string
+  status: string
+  sendCount: number
+  lastSentAt: string
+  createdAt: string
+  expiresAt: string
+  respondedAt?: string
+  acceptedUserId?: string
+  acceptedUserName?: string
+}
+
+export interface AdminCaInvitationSearchParams {
+  search?: string
+  caUserId?: string
+  status?: string
+  sortBy?: string
+  sortDesc?: boolean
+  page?: number
+  pageSize?: number
+}
+
+// CA Admin Action Requests
+export interface AdminVerifyCaRequest {
+  membershipVerified: boolean
+  notes?: string
+}
+
+export interface AdminSuspendCaRequest {
+  reason: string
+  notes?: string
+}
+
+export interface AdminCaListResponse {
+  cas: AdminCaProfileListItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}
+
+export interface AdminCaRelationshipListResponse {
+  relationships: AdminCaRelationshipListItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}
+
+export interface AdminCaInvitationListResponse {
+  invitations: AdminCaInvitationListItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}

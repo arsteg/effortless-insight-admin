@@ -21,6 +21,9 @@ import {
   Package,
   LifeBuoy,
   UserPlus,
+  Briefcase,
+  Link2,
+  Mail,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -53,6 +56,24 @@ const mainNavItems: NavItem[] = [
     href: '/organizations',
     icon: Building2,
     permission: ADMIN_PERMISSIONS.ORGS_VIEW,
+  },
+  {
+    title: 'CAs',
+    href: '/cas',
+    icon: Briefcase,
+    permission: ADMIN_PERMISSIONS.USERS_VIEW,
+  },
+  {
+    title: 'CA Relationships',
+    href: '/ca-relationships',
+    icon: Link2,
+    permission: ADMIN_PERMISSIONS.USERS_VIEW,
+  },
+  {
+    title: 'CA Invitations',
+    href: '/ca-invitations',
+    icon: Mail,
+    permission: ADMIN_PERMISSIONS.USERS_VIEW,
   },
   {
     title: 'Billing',

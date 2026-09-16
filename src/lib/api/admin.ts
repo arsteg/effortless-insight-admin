@@ -8,6 +8,11 @@ import type {
   AdminSubscriptionDetail, AdminInvoiceListItem, AuditSearchParams, AuditSearchResult,
   AuditStats, PaginatedResponse, AdminUser, AdminUserDetail, AdminPlan, AdminPlanListItem,
   PlanSearchParams, CreatePlanRequest, UpdatePlanRequest,
+  // CA Management Types
+  AdminCaProfileListItem, AdminCaProfileDetail, AdminCaSearchParams, AdminCaListResponse,
+  AdminCaRelationshipListItem, AdminCaRelationshipDetail, AdminCaRelationshipSearchParams, AdminCaRelationshipListResponse,
+  AdminCaInvitationListItem, AdminCaInvitationSearchParams, AdminCaInvitationListResponse,
+  AdminVerifyCaRequest, AdminSuspendCaRequest,
 } from '@/types/admin'
 
 export const adminAuthApi = {
@@ -499,6 +504,110 @@ export const adminSystemSettingsApi = {
   },
 }
 
+// ============================================================================
+// CA Management APIs
+// ============================================================================
+
+// Helper to transform CA paginated response
+function transformCaPaginatedResponse<T>(data: AdminCaListResponse): PaginatedResponse<T> {
+  return {
+    items: data.cas as T[],
+    totalCount: data.pagination.totalRecords,
+    page: data.pagination.page,
+    pageSize: data.pagination.pageSize,
+    totalPages: data.pagination.totalPages,
+  }
+}
+
+function transformCaRelationshipPaginatedResponse<T>(data: AdminCaRelationshipListResponse): PaginatedResponse<T> {
+  return {
+    items: data.relationships as T[],
+    totalCount: data.pagination.totalRecords,
+    page: data.pagination.page,
+    pageSize: data.pagination.pageSize,
+    totalPages: data.pagination.totalPages,
+  }
+}
+
+function transformCaInvitationPaginatedResponse<T>(data: AdminCaInvitationListResponse): PaginatedResponse<T> {
+  return {
+    items: data.invitations as T[],
+    totalCount: data.pagination.totalRecords,
+    page: data.pagination.page,
+    pageSize: data.pagination.pageSize,
+    totalPages: data.pagination.totalPages,
+  }
+}
+
+export const adminCasApi = {
+  /** List all CA profiles with optional filtering */
+  list: async (params?: AdminCaSearchParams): Promise<PaginatedResponse<AdminCaProfileListItem>> => {
+    const response = await adminClient.get('/admin/cas', { params })
+    const data = extractData<AdminCaListResponse>(response)
+    return transformCaPaginatedResponse(data)
+  },
+
+  /** Get detailed CA profile by ID */
+  get: async (caProfileId: string): Promise<AdminCaProfileDetail> => {
+    const response = await adminClient.get(`/admin/cas/${caProfileId}`)
+    return extractData(response)
+  },
+
+  /** Verify a CA (mark as verified) */
+  verify: async (caProfileId: string, request: AdminVerifyCaRequest): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/verify`, request)
+  },
+
+  /** Revoke CA verification */
+  revokeVerification: async (caProfileId: string, reason?: string): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/revoke-verification`, { reason })
+  },
+
+  /** Suspend a CA account */
+  suspend: async (caProfileId: string, request: AdminSuspendCaRequest): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/suspend`, request)
+  },
+
+  /** Unsuspend a CA account */
+  unsuspend: async (caProfileId: string): Promise<void> => {
+    await adminClient.post(`/admin/cas/${caProfileId}/unsuspend`)
+  },
+}
+
+export const adminCaRelationshipsApi = {
+  /** List all CA-Client relationships with optional filtering */
+  list: async (params?: AdminCaRelationshipSearchParams): Promise<PaginatedResponse<AdminCaRelationshipListItem>> => {
+    const response = await adminClient.get('/admin/ca-relationships', { params })
+    const data = extractData<AdminCaRelationshipListResponse>(response)
+    return transformCaRelationshipPaginatedResponse(data)
+  },
+
+  /** Get detailed CA-Client relationship by ID */
+  get: async (relationshipId: string): Promise<AdminCaRelationshipDetail> => {
+    const response = await adminClient.get(`/admin/ca-relationships/${relationshipId}`)
+    return extractData(response)
+  },
+
+  /** Revoke a CA-Client relationship (admin override) */
+  revoke: async (relationshipId: string, reason: string): Promise<void> => {
+    await adminClient.post(`/admin/ca-relationships/${relationshipId}/revoke`, { reason })
+  },
+}
+
+export const adminCaInvitationsApi = {
+  /** List all CA invitations with optional filtering */
+  list: async (params?: AdminCaInvitationSearchParams): Promise<PaginatedResponse<AdminCaInvitationListItem>> => {
+    const response = await adminClient.get('/admin/ca-invitations', { params })
+    const data = extractData<AdminCaInvitationListResponse>(response)
+    return transformCaInvitationPaginatedResponse(data)
+  },
+
+  /** Cancel a pending invitation (admin override) */
+  cancel: async (invitationId: string, reason: string): Promise<void> => {
+    await adminClient.post(`/admin/ca-invitations/${invitationId}/cancel`, { reason })
+  },
+}
+
 export const adminApi = {
   auth: adminAuthApi,
   dashboard: adminDashboardApi,
@@ -511,6 +620,9 @@ export const adminApi = {
   aiOps: adminAiOpsApi,
   content: adminContentApi,
   systemSettings: adminSystemSettingsApi,
+  cas: adminCasApi,
+  caRelationships: adminCaRelationshipsApi,
+  caInvitations: adminCaInvitationsApi,
   tokens: adminTokens,
 }
 
