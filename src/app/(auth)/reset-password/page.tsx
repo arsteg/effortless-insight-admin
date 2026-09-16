@@ -97,8 +97,8 @@ function ResetPasswordContent() {
             <span className="font-semibold text-lg">Admin Portal</span>
           </div>
           <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="h-12 w-12 rounded-full bg-coral-100 dark:bg-coral-900/30 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-coral-600 dark:text-coral-400" />
             </div>
           </div>
           <CardTitle className="text-2xl text-center">Invalid Link</CardTitle>
@@ -126,8 +126,8 @@ function ResetPasswordContent() {
             <span className="font-semibold text-lg">Admin Portal</span>
           </div>
           <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="h-12 w-12 rounded-full bg-mint-100 dark:bg-mint-900/30 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-mint-600 dark:text-mint-400" />
             </div>
           </div>
           <CardTitle className="text-2xl text-center">Password Reset</CardTitle>

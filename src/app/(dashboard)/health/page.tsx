@@ -24,12 +24,12 @@ import { cn } from '@/lib/utils'
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'healthy':
-      return 'bg-green-500'
+      return 'bg-mint-500'
     case 'degraded':
-      return 'bg-yellow-500'
+      return 'bg-amber-500'
     case 'down':
     case 'critical':
-      return 'bg-red-500'
+      return 'bg-coral-500'
     default:
       return 'bg-gray-500'
   }
@@ -38,12 +38,12 @@ const getStatusColor = (status: string) => {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'healthy':
-      return <CheckCircle className="h-5 w-5 text-green-500" />
+      return <CheckCircle className="h-5 w-5 text-mint-500" />
     case 'degraded':
-      return <AlertTriangle className="h-5 w-5 text-yellow-500" />
+      return <AlertTriangle className="h-5 w-5 text-amber-500" />
     case 'down':
     case 'critical':
-      return <XCircle className="h-5 w-5 text-red-500" />
+      return <XCircle className="h-5 w-5 text-coral-500" />
     default:
       return <Activity className="h-5 w-5 text-gray-500" />
   }
@@ -90,9 +90,9 @@ export default function HealthPage() {
               <div
                 className={cn(
                   'h-16 w-16 rounded-full flex items-center justify-center',
-                  health?.status === 'healthy' && 'bg-green-100 dark:bg-green-900/30',
-                  health?.status === 'degraded' && 'bg-yellow-100 dark:bg-yellow-900/30',
-                  health?.status === 'critical' && 'bg-red-100 dark:bg-red-900/30'
+                  health?.status === 'healthy' && 'bg-mint-100 dark:bg-mint-900/30',
+                  health?.status === 'degraded' && 'bg-amber-100 dark:bg-amber-900/30',
+                  health?.status === 'critical' && 'bg-coral-100 dark:bg-coral-900/30'
                 )}
               >
                 {getStatusIcon(health?.status ?? 'unknown')}
@@ -132,9 +132,9 @@ export default function HealthPage() {
                   variant="secondary"
                   className={cn(
                     'capitalize',
-                    component.status === 'healthy' && 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                    component.status === 'degraded' && 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                    component.status === 'down' && 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    component.status === 'healthy' && 'bg-mint-100 text-mint-800 dark:bg-mint-900/30 dark:text-mint-400',
+                    component.status === 'degraded' && 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+                    component.status === 'down' && 'bg-coral-100 text-coral-800 dark:bg-coral-900/30 dark:text-coral-400'
                   )}
                 >
                   {component.status}
@@ -149,9 +149,9 @@ export default function HealthPage() {
                     <span
                       className={cn(
                         'font-medium',
-                        component.latencyMs < 100 && 'text-green-600',
-                        component.latencyMs >= 100 && component.latencyMs < 500 && 'text-yellow-600',
-                        component.latencyMs >= 500 && 'text-red-600'
+                        component.latencyMs < 100 && 'text-mint-600',
+                        component.latencyMs >= 100 && component.latencyMs < 500 && 'text-amber-600',
+                        component.latencyMs >= 500 && 'text-coral-600'
                       )}
                     >
                       {component.latencyMs}ms
@@ -165,9 +165,9 @@ export default function HealthPage() {
                   value={component.status === 'healthy' ? 100 : component.status === 'degraded' ? 50 : 0}
                   className={cn(
                     'h-1',
-                    component.status === 'healthy' && '[&>div]:bg-green-500',
-                    component.status === 'degraded' && '[&>div]:bg-yellow-500',
-                    component.status === 'down' && '[&>div]:bg-red-500'
+                    component.status === 'healthy' && '[&>div]:bg-mint-500',
+                    component.status === 'degraded' && '[&>div]:bg-amber-500',
+                    component.status === 'down' && '[&>div]:bg-coral-500'
                   )}
                 />
               </div>
@@ -184,15 +184,15 @@ export default function HealthPage() {
         <CardContent>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-green-500" />
+              <div className="h-3 w-3 rounded-full bg-mint-500" />
               <span className="text-sm">Good (&lt;100ms)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-yellow-500" />
+              <div className="h-3 w-3 rounded-full bg-amber-500" />
               <span className="text-sm">Moderate (100-500ms)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-500" />
+              <div className="h-3 w-3 rounded-full bg-coral-500" />
               <span className="text-sm">Slow (&gt;500ms)</span>
             </div>
           </div>

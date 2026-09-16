@@ -4,11 +4,23 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 import type { ReactNode } from 'react'
 
+type StatAccent = 'azure' | 'mint' | 'amber' | 'lavender' | 'coral'
+
+const accentChip: Record<StatAccent, string> = {
+  azure: 'bg-azure-50 text-azure-600 dark:bg-azure-500/15 dark:text-azure-300',
+  mint: 'bg-mint-50 text-mint-600 dark:bg-mint-500/15 dark:text-mint-300',
+  amber: 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300',
+  lavender: 'bg-lavender-50 text-lavender-600 dark:bg-lavender-500/15 dark:text-lavender-300',
+  coral: 'bg-coral-50 text-coral-600 dark:bg-coral-500/15 dark:text-coral-300',
+}
+
 interface StatCardProps {
   title: string
   value: string | number
   description?: string
   icon?: ReactNode
+  /** Accent family for the icon chip (see DESIGN_SYSTEM.md). Defaults to azure. */
+  accent?: StatAccent
   trend?: number
   trendLabel?: string
   isLoading?: boolean
@@ -20,6 +32,7 @@ export function StatCard({
   value,
   description,
   icon,
+  accent = 'azure',
   trend,
   trendLabel,
   isLoading,
@@ -48,16 +61,20 @@ export function StatCard({
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        {icon && <div className="text-muted-foreground">{icon}</div>}
+        {icon && (
+          <div className={cn('flex h-9 w-9 items-center justify-center rounded-xl', accentChip[accent])}>
+            {icon}
+          </div>
+        )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold tracking-tight tabular-nums">{value}</div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {trend !== undefined && (
             <span
               className={cn(
-                'flex items-center gap-0.5 font-medium',
-                isPositiveTrend ? 'text-green-600' : 'text-red-600'
+                'flex items-center gap-0.5 font-semibold tabular-nums',
+                isPositiveTrend ? 'text-mint-600' : 'text-coral-600'
               )}
             >
               {isPositiveTrend ? (

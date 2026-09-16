@@ -67,8 +67,8 @@ export default function ForgotPasswordPage() {
             <span className="font-semibold text-lg">Admin Portal</span>
           </div>
           <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="h-12 w-12 rounded-full bg-mint-100 dark:bg-mint-900/30 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-mint-600 dark:text-mint-400" />
             </div>
           </div>
           <CardTitle className="text-2xl text-center">Check your email</CardTitle>

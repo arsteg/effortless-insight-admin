@@ -30,7 +30,7 @@ export function ContentPreviewDialog({
     switch (status) {
       case 'published':
         return (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <Badge variant="secondary" className="bg-mint-100 text-mint-800 dark:bg-mint-900/30 dark:text-mint-400">
             <Globe className="mr-1 h-3 w-3" />
             Published
           </Badge>
@@ -72,7 +72,7 @@ export function ContentPreviewDialog({
                 <div className="flex items-center gap-2 flex-wrap">
                   {getStatusBadge(content.status)}
                   {content.isFeatured && (
-                    <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                    <Badge variant="outline" className="text-amber-600 border-amber-600">
                       Featured
                     </Badge>
                   )}

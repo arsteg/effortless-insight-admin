@@ -95,7 +95,7 @@ export default function ContentPage() {
     switch (status) {
       case 'published':
         return (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <Badge variant="secondary" className="bg-mint-100 text-mint-800 dark:bg-mint-900/30 dark:text-mint-400">
             <Globe className="mr-1 h-3 w-3" />
             Published
           </Badge>
@@ -168,7 +168,7 @@ export default function ContentPage() {
                   <span className="font-medium">{item.title}</span>
                   {getStatusBadge(item.status)}
                   {item.isFeatured && (
-                    <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                    <Badge variant="outline" className="text-amber-600 border-amber-600">
                       Featured
                     </Badge>
                   )}
@@ -221,7 +221,7 @@ export default function ContentPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-green-600"
+                      className="h-8 w-8 text-mint-600"
                       title="Publish"
                       onClick={() => handlePublish(item.id)}
                       disabled={publishMutation.isPending}

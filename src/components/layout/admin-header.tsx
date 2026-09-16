@@ -46,9 +46,9 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/85 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold">EffortlessInsight Admin</h1>
+        <h1 className="text-lg font-semibold tracking-tight">EffortlessInsight Admin</h1>
       </div>
 
       <div className="flex items-center gap-4">
@@ -72,7 +72,7 @@ export function AdminHeader() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+            <button className="flex items-center gap-2 px-2 py-1.5 rounded-xl transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={adminUser?.avatarUrl} alt={adminUser?.name} />
                 <AvatarFallback>

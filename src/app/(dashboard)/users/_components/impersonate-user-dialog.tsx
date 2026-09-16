@@ -69,9 +69,9 @@ export function ImpersonateUserDialog({ user, open, onOpenChange }: ImpersonateU
           </DialogDescription>
         </DialogHeader>
 
-        <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+        <Alert variant="default" className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
             This action will be logged in the audit trail. You will have read-only access
             and cannot make any changes on behalf of the user.
           </AlertDescription>

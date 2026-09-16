@@ -48,73 +48,136 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * "Calm Intelligence" tokens — shared with web + mobile (see ../DESIGN_SYSTEM.md).
+ * Warm paper foundation, ink-navy text, azure brand, pastel accent families.
+ * Values in hsl() (valid in Tailwind v4) rather than the previous grayscale oklch.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: hsl(38 36% 97.5%); /* warm paper white */
+  --foreground: hsl(222 32% 16%); /* ink navy */
+  --card: hsl(40 44% 99%);
+  --card-foreground: hsl(222 32% 16%);
+  --popover: hsl(40 44% 99%);
+  --popover-foreground: hsl(222 32% 16%);
+  --primary: hsl(202 90% 42%); /* azure — admin runs a touch deeper for density */
+  --primary-foreground: hsl(40 44% 99%);
+  --secondary: hsl(40 24% 95%);
+  --secondary-foreground: hsl(222 30% 20%);
+  --muted: hsl(40 24% 95%);
+  --muted-foreground: hsl(220 14% 44%);
+  --accent: hsl(202 85% 94%);
+  --accent-foreground: hsl(202 82% 28%);
+  --destructive: hsl(9 82% 58%); /* warm coral */
+  --border: hsl(40 20% 89%);
+  --input: hsl(40 20% 89%);
+  --ring: hsl(202 90% 48%);
+  --chart-1: hsl(202 90% 48%); /* azure */
+  --chart-2: hsl(160 62% 40%); /* mint */
+  --chart-3: hsl(255 72% 68%); /* lavender */
+  --chart-4: hsl(35 92% 55%); /* amber */
+  --chart-5: hsl(9 82% 64%); /* coral */
+  --radius: 0.875rem;
+  --sidebar: hsl(222 34% 13%); /* deep ink-navy rail — calm, not black */
+  --sidebar-foreground: hsl(210 30% 88%);
+  --sidebar-primary: hsl(202 90% 56%);
+  --sidebar-primary-foreground: hsl(222 40% 12%);
+  --sidebar-accent: hsl(222 26% 20%);
+  --sidebar-accent-foreground: hsl(210 40% 96%);
+  --sidebar-border: hsl(222 22% 22%);
+  --sidebar-ring: hsl(202 90% 56%);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: hsl(222 34% 9%);
+  --foreground: hsl(40 30% 96%);
+  --card: hsl(222 30% 13%);
+  --card-foreground: hsl(40 30% 96%);
+  --popover: hsl(222 30% 13%);
+  --popover-foreground: hsl(40 30% 96%);
+  --primary: hsl(202 88% 60%);
+  --primary-foreground: hsl(222 40% 12%);
+  --secondary: hsl(222 22% 20%);
+  --secondary-foreground: hsl(40 30% 96%);
+  --muted: hsl(222 22% 20%);
+  --muted-foreground: hsl(220 16% 68%);
+  --accent: hsl(222 26% 22%);
+  --accent-foreground: hsl(202 85% 82%);
+  --destructive: hsl(9 72% 60%);
+  --border: hsl(222 20% 22%);
+  --input: hsl(222 20% 24%);
+  --ring: hsl(202 88% 60%);
+  --chart-1: hsl(202 88% 62%);
+  --chart-2: hsl(160 58% 52%);
+  --chart-3: hsl(255 78% 76%);
+  --chart-4: hsl(38 92% 62%);
+  --chart-5: hsl(9 82% 68%);
+  --sidebar: hsl(222 38% 7%);
+  --sidebar-foreground: hsl(210 30% 88%);
+  --sidebar-primary: hsl(202 90% 60%);
+  --sidebar-primary-foreground: hsl(222 40% 10%);
+  --sidebar-accent: hsl(222 24% 18%);
+  --sidebar-accent-foreground: hsl(210 40% 96%);
+  --sidebar-border: hsl(222 20% 18%);
+  --sidebar-ring: hsl(202 90% 60%);
+}
+
+/* Accent family scales — usable as bg-azure-50, text-mint-700, etc. */
+@theme {
+  --color-azure-50: #eaf5fd;
+  --color-azure-100: #d2eafb;
+  --color-azure-200: #a9d6f6;
+  --color-azure-300: #74bcef;
+  --color-azure-400: #3aa0e7;
+  --color-azure-500: #0e93e0;
+  --color-azure-600: #0a78bd;
+  --color-azure-700: #0a6199;
+  --color-azure-800: #0d4f7b;
+  --color-azure-900: #103f61;
+
+  --color-mint-50: #e6f6ef;
+  --color-mint-100: #c8ecdb;
+  --color-mint-200: #95dcbd;
+  --color-mint-300: #5ec69b;
+  --color-mint-400: #31ac7c;
+  --color-mint-500: #1f9968;
+  --color-mint-600: #157a53;
+  --color-mint-700: #0f6144;
+  --color-mint-800: #0d4d37;
+  --color-mint-900: #0b3f2e;
+
+  --color-coral-50: #fdeee9;
+  --color-coral-100: #fbd9cf;
+  --color-coral-200: #f7b3a2;
+  --color-coral-300: #f28a72;
+  --color-coral-400: #ee6a54;
+  --color-coral-500: #e8563e;
+  --color-coral-600: #cf3d28;
+  --color-coral-700: #ac2f1f;
+  --color-coral-800: #8a281d;
+  --color-coral-900: #71241c;
+
+  --color-amber-50: #fdf4e3;
+  --color-amber-100: #fae4bd;
+  --color-amber-200: #f5cd84;
+  --color-amber-300: #f0b451;
+  --color-amber-400: #eca02f;
+  --color-amber-500: #e08d17;
+  --color-amber-600: #c1700f;
+  --color-amber-700: #9a5410;
+  --color-amber-800: #7d4413;
+  --color-amber-900: #673913;
+
+  --color-lavender-50: #f1eefc;
+  --color-lavender-100: #e5defb;
+  --color-lavender-200: #cec1f6;
+  --color-lavender-300: #b19cf0;
+  --color-lavender-400: #977ce8;
+  --color-lavender-500: #7f5fdd;
+  --color-lavender-600: #6b48cc;
+  --color-lavender-700: #5a3aad;
+  --color-lavender-800: #4a318c;
+  --color-lavender-900: #3d2b71;
 }
 
 @layer base {
@@ -122,9 +185,70 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11" 1, "ss01" 1;
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background-color: hsl(202 90% 48% / 0.16);
+    color: hsl(222 32% 16%);
+  }
+}
+
+/*
+ * Domain design language — shared with web + mobile (see ../DESIGN_SYSTEM.md).
+ * Risk pills, AI panels, deadline chips, notice rails, stat cards.
+ */
+@layer components {
+  .risk-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .risk-badge::before {
+    content: '';
+    @apply h-1.5 w-1.5 rounded-full bg-current opacity-80;
+  }
+  .risk-badge-low {
+    @apply bg-mint-50 text-mint-700;
+  }
+  .risk-badge-medium {
+    @apply bg-amber-50 text-amber-700;
+  }
+  .risk-badge-high {
+    @apply bg-coral-50 text-coral-700;
+  }
+  .risk-badge-critical {
+    @apply bg-coral-100 text-coral-800;
+  }
+
+  .ai-panel {
+    @apply relative rounded-2xl border border-lavender-200 bg-lavender-50/60 shadow-sm;
+  }
+  .ai-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-lavender-50 px-2.5 py-0.5 text-xs font-semibold text-lavender-700;
+  }
+
+  .deadline-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums;
+  }
+  .deadline-comfortable {
+    @apply bg-mint-50 text-mint-700;
+  }
+  .deadline-approaching {
+    @apply bg-amber-50 text-amber-700;
+  }
+  .deadline-overdue {
+    @apply bg-coral-50 text-coral-700;
+  }
+
+  .stat-card {
+    @apply relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em];
+  }
+  .nums {
+    font-variant-numeric: tabular-nums;
   }
 }

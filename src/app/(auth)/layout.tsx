@@ -4,8 +4,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
-        <div className="max-w-md text-center">
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-azure-600 via-azure-700 to-[#0c2f4d] p-12 lg:flex lg:w-1/2 lg:items-center lg:justify-center">
+        {/* soft depth orbs */}
+        <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-lavender-400/20 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-mint-400/15 blur-3xl" />
+        <div className="relative max-w-md text-center">
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className="h-12 w-12 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
               <svg

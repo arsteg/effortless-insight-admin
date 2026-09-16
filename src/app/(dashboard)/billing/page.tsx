@@ -134,7 +134,7 @@ export default function BillingPage() {
               ) : (
                 <>
                   {overview?.trialConversionRate?.toFixed(1) ?? 0}%
-                  <ArrowUpRight className="h-4 w-4 text-green-500" />
+                  <ArrowUpRight className="h-4 w-4 text-mint-500" />
                 </>
               )}
             </CardTitle>
@@ -153,7 +153,7 @@ export default function BillingPage() {
               ) : (
                 <>
                   {overview?.cancelledSubscriptions ?? 0}
-                  <ArrowDownRight className="h-4 w-4 text-red-500" />
+                  <ArrowDownRight className="h-4 w-4 text-coral-500" />
                 </>
               )}
             </CardTitle>

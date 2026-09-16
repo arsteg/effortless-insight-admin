@@ -102,6 +102,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Active Users"
+          accent="azure"
           value={metrics?.users.active.toLocaleString() ?? '-'}
           description={`${metrics?.users.new ?? 0} new this period`}
           trend={metrics?.users.growth}
@@ -110,6 +111,7 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Organizations"
+          accent="lavender"
           value={metrics?.organizations.active.toLocaleString() ?? '-'}
           description={`${metrics?.organizations.new ?? 0} new this period`}
           icon={<Building2 className="h-4 w-4" />}
@@ -117,6 +119,7 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Monthly Revenue"
+          accent="mint"
           value={metrics?.revenue.mrr ? formatCurrency(metrics.revenue.mrr) : '-'}
           description="MRR"
           trend={metrics?.revenue.growth}
@@ -125,6 +128,7 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Notices Processed"
+          accent="amber"
           value={metrics?.notices.completed.toLocaleString() ?? '-'}
           description={`${metrics?.notices.processing ?? 0} in queue`}
           icon={<FileText className="h-4 w-4" />}
@@ -159,15 +163,15 @@ export default function DashboardPage() {
                 {health.components.map((component) => (
                   <div
                     key={component.name}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex items-center justify-between rounded-xl border bg-card p-3"
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={cn(
                           'h-2 w-2 rounded-full',
-                          component.status === 'healthy' && 'bg-green-500',
-                          component.status === 'degraded' && 'bg-yellow-500',
-                          component.status === 'down' && 'bg-red-500'
+                          component.status === 'healthy' && 'bg-mint-500',
+                          component.status === 'degraded' && 'bg-amber-500',
+                          component.status === 'down' && 'bg-coral-500'
                         )}
                       />
                       <span className="font-medium">{component.name}</span>
@@ -220,8 +224,8 @@ export default function DashboardPage() {
                       key={alert.id}
                       className={cn(
                         'rounded-lg border p-3',
-                        alert.priority === 'critical' && 'border-red-500/50 bg-red-50 dark:bg-red-900/10',
-                        alert.priority === 'high' && 'border-orange-500/50 bg-orange-50 dark:bg-orange-900/10'
+                        alert.priority === 'critical' && 'border-coral-300 bg-coral-50 dark:border-coral-500/40 dark:bg-coral-500/10',
+                        alert.priority === 'high' && 'border-amber-300 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-500/10'
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -231,9 +235,9 @@ export default function DashboardPage() {
                             <Badge
                               variant="outline"
                               className={cn(
-                                alert.priority === 'critical' && 'border-red-500 text-red-500',
-                                alert.priority === 'high' && 'border-orange-500 text-orange-500',
-                                alert.priority === 'medium' && 'border-yellow-500 text-yellow-500'
+                                alert.priority === 'critical' && 'border-coral-500 text-coral-600',
+                                alert.priority === 'high' && 'border-amber-500 text-amber-600',
+                                alert.priority === 'medium' && 'border-amber-400 text-amber-600'
                               )}
                             >
                               {alert.priority}
@@ -275,7 +279,7 @@ export default function DashboardPage() {
               </ScrollArea>
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <CheckCircle className="h-10 w-10 text-green-500 mb-2" />
+                <CheckCircle className="h-10 w-10 text-mint-500 mb-2" />
                 <p className="text-muted-foreground">No active alerts</p>
               </div>
             )}
@@ -302,22 +306,22 @@ export default function DashboardPage() {
             ) : metrics?.notices ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-lg border p-4 text-center">
-                    <p className="text-2xl font-bold">{metrics.notices.processing}</p>
+                  <div className="rounded-xl border bg-muted/30 p-4 text-center">
+                    <p className="text-2xl font-bold tabular-nums">{metrics.notices.processing}</p>
                     <p className="text-sm text-muted-foreground">In Queue</p>
                   </div>
-                  <div className="rounded-lg border p-4 text-center">
-                    <p className="text-2xl font-bold">{metrics.notices.avgProcessingTimeSeconds}s</p>
+                  <div className="rounded-xl border bg-muted/30 p-4 text-center">
+                    <p className="text-2xl font-bold tabular-nums">{metrics.notices.avgProcessingTimeSeconds}s</p>
                     <p className="text-sm text-muted-foreground">Avg Time</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
-                    <p className="text-lg font-semibold text-green-600">{metrics.notices.completed}</p>
+                    <p className="text-lg font-semibold tabular-nums text-mint-600">{metrics.notices.completed}</p>
                     <p className="text-xs text-muted-foreground">Completed</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-lg font-semibold text-red-600">{metrics.notices.failed}</p>
+                    <p className="text-lg font-semibold tabular-nums text-coral-600">{metrics.notices.failed}</p>
                     <p className="text-xs text-muted-foreground">Failed</p>
                   </div>
                   <div className="text-center">
@@ -351,7 +355,7 @@ export default function DashboardPage() {
                       <div
                         className={cn(
                           'h-2 w-2 rounded-full mt-1.5',
-                          activity.outcome === 'success' ? 'bg-green-500' : 'bg-red-500'
+                          activity.outcome === 'success' ? 'bg-mint-500' : 'bg-coral-500'
                         )}
                       />
                       <div className="flex-1 space-y-1">

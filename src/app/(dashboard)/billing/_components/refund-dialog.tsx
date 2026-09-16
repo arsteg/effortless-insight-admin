@@ -100,9 +100,9 @@ export function RefundDialog({ invoice, open, onOpenChange }: RefundDialogProps)
             </AlertDescription>
           </Alert>
         ) : (
-          <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+          <Alert variant="default" className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800 dark:text-amber-200">
               This action will initiate a refund through Razorpay. The refund may take 5-7 business
               days to process.
             </AlertDescription>

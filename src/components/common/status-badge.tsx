@@ -42,11 +42,11 @@ const statusTypeMap: Record<string, StatusType> = {
 }
 
 const typeStyles: Record<StatusType, string> = {
-  success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  error: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  default: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+  success: 'bg-mint-50 text-mint-700 dark:bg-mint-500/15 dark:text-mint-300',
+  warning: 'bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+  error: 'bg-coral-50 text-coral-700 dark:bg-coral-500/15 dark:text-coral-300',
+  info: 'bg-azure-50 text-azure-700 dark:bg-azure-500/15 dark:text-azure-300',
+  default: 'bg-muted text-muted-foreground',
 }
 
 export function StatusBadge({ status, type, className }: StatusBadgeProps) {

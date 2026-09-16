@@ -114,14 +114,14 @@ export default function AuditPage() {
       cell: (log) => (
         <div className="flex items-center gap-2">
           {log.outcome === 'success' ? (
-            <CheckCircle className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-mint-500" />
           ) : (
-            <XCircle className="h-4 w-4 text-red-500" />
+            <XCircle className="h-4 w-4 text-coral-500" />
           )}
           <span
             className={cn(
               'text-sm capitalize',
-              log.outcome === 'success' ? 'text-green-600' : 'text-red-600'
+              log.outcome === 'success' ? 'text-mint-600' : 'text-coral-600'
             )}
           >
             {log.outcome}

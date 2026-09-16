@@ -142,22 +142,22 @@ export function AdminSidebar() {
           isCollapsed ? 'w-16' : 'w-64'
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b px-4">
+        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
           {!isCollapsed && (
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-primary" />
-              <span className="font-semibold text-lg">Admin Portal</span>
+              <Shield className="h-6 w-6 text-azure-400" />
+              <span className="font-semibold text-lg tracking-tight text-white">Admin Portal</span>
             </Link>
           )}
           {isCollapsed && (
             <Link href="/dashboard" className="mx-auto">
-              <Shield className="h-6 w-6 text-primary" />
+              <Shield className="h-6 w-6 text-azure-400" />
             </Link>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className={cn('h-8 w-8', isCollapsed && 'mx-auto')}
+            className={cn('h-8 w-8 text-sidebar-foreground/70 hover:bg-white/10 hover:text-white', isCollapsed && 'mx-auto')}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -181,10 +181,10 @@ export function AdminSidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          'flex h-10 w-10 items-center justify-center rounded-md mx-auto',
+                          'flex h-10 w-10 items-center justify-center rounded-xl mx-auto',
                           isActive
-                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                            ? 'bg-azure-500/15 text-white ring-1 ring-inset ring-azure-400/25 [&_svg]:text-azure-300'
+                            : 'text-sidebar-foreground/80 hover:bg-white/5 hover:text-white'
                         )}
                       >
                         <Icon className="h-5 w-5" />
@@ -200,10 +200,10 @@ export function AdminSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
                     isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                      ? 'bg-azure-500/15 text-white ring-1 ring-inset ring-azure-400/25 [&_svg]:text-azure-300'
+                      : 'text-sidebar-foreground/80 hover:bg-white/5 hover:text-white'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -213,7 +213,7 @@ export function AdminSidebar() {
             })}
           </nav>
 
-          <Separator className="my-4" />
+          <Separator className="my-4 bg-white/10" />
 
           <nav className="space-y-1">
             {filteredSecondaryNav.map((item) => {
@@ -227,10 +227,10 @@ export function AdminSidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          'flex h-10 w-10 items-center justify-center rounded-md mx-auto',
+                          'flex h-10 w-10 items-center justify-center rounded-xl mx-auto',
                           isActive
-                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                            ? 'bg-azure-500/15 text-white ring-1 ring-inset ring-azure-400/25 [&_svg]:text-azure-300'
+                            : 'text-sidebar-foreground/80 hover:bg-white/5 hover:text-white'
                         )}
                       >
                         <Icon className="h-5 w-5" />
@@ -246,10 +246,10 @@ export function AdminSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
                     isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                      ? 'bg-azure-500/15 text-white ring-1 ring-inset ring-azure-400/25 [&_svg]:text-azure-300'
+                      : 'text-sidebar-foreground/80 hover:bg-white/5 hover:text-white'
                   )}
                 >
                   <Icon className="h-5 w-5" />

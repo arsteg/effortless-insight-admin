@@ -119,8 +119,8 @@ export default function UserDetailPage({ params }: PageProps) {
               {user.lockedAt && (
                 <>
                   <Separator className="my-4" />
-                  <div className="w-full p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-sm">
-                    <p className="font-medium text-red-600 dark:text-red-400">Account Locked</p>
+                  <div className="w-full p-3 rounded-lg bg-coral-50 dark:bg-coral-900/20 text-sm">
+                    <p className="font-medium text-coral-600 dark:text-coral-400">Account Locked</p>
                     <p className="text-muted-foreground mt-1">{user.lockoutReason}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Locked at {format(new Date(user.lockedAt), 'MMM d, yyyy HH:mm')}
@@ -225,7 +225,7 @@ export default function UserDetailPage({ params }: PageProps) {
                         <div className="flex items-center gap-3">
                           <div
                             className={`h-2 w-2 rounded-full ${
-                              login.success ? 'bg-green-500' : 'bg-red-500'
+                              login.success ? 'bg-mint-500' : 'bg-coral-500'
                             }`}
                           />
                           <div>

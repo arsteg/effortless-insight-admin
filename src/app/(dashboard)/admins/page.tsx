@@ -101,12 +101,12 @@ export default function AdminUsersPage() {
       header: 'MFA',
       cell: (admin) =>
         admin.mfaEnabled ? (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <Badge variant="secondary" className="bg-mint-100 text-mint-800 dark:bg-mint-900/30 dark:text-mint-400">
             <Shield className="mr-1 h-3 w-3" />
             Enabled
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
             <ShieldOff className="mr-1 h-3 w-3" />
             Disabled
           </Badge>

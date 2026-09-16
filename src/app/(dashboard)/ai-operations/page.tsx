@@ -97,13 +97,13 @@ export default function AIOperationsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-mint-500" />
       case 'failed':
-        return <XCircle className="h-4 w-4 text-red-500" />
+        return <XCircle className="h-4 w-4 text-coral-500" />
       case 'processing':
-        return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />
+        return <RefreshCw className="h-4 w-4 text-azure-500 animate-spin" />
       case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />
+        return <Clock className="h-4 w-4 text-amber-500" />
       default:
         return <AlertTriangle className="h-4 w-4 text-gray-500" />
     }
@@ -219,6 +219,7 @@ export default function AIOperationsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="In Queue"
+          accent="amber"
           value={stats?.totalPending.toLocaleString() ?? '-'}
           description="Pending jobs"
           icon={<Clock className="h-4 w-4" />}
@@ -226,6 +227,7 @@ export default function AIOperationsPage() {
         />
         <StatCard
           title="Processing"
+          accent="azure"
           value={stats?.totalProcessing.toLocaleString() ?? '-'}
           description="Active jobs"
           icon={<Zap className="h-4 w-4" />}
@@ -233,6 +235,7 @@ export default function AIOperationsPage() {
         />
         <StatCard
           title="Success Rate"
+          accent="mint"
           value={stats ? `${stats.successRate.toFixed(1)}%` : '-'}
           description="All time"
           icon={<CheckCircle className="h-4 w-4" />}
@@ -240,6 +243,7 @@ export default function AIOperationsPage() {
         />
         <StatCard
           title="Avg Processing"
+          accent="lavender"
           value={stats ? `${(stats.avgProcessingTimeMs / 1000).toFixed(1)}s` : '-'}
           description="Per job"
           icon={<Brain className="h-4 w-4" />}
@@ -356,7 +360,7 @@ export default function AIOperationsPage() {
                           <span className="font-medium">{prompt.name}</span>
                           <Badge variant="outline">v{prompt.version}</Badge>
                           {prompt.isActive && (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            <Badge variant="secondary" className="bg-mint-100 text-mint-800 dark:bg-mint-900/30 dark:text-mint-400">
                               Active
                             </Badge>
                           )}
@@ -400,7 +404,7 @@ export default function AIOperationsPage() {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Badge variant="outline">Version {editingPrompt?.version}</Badge>
                 {editingPrompt?.isActive && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">Active</Badge>
+                  <Badge variant="secondary" className="bg-mint-100 text-mint-800">Active</Badge>
                 )}
               </div>
               <div className="space-y-2">
