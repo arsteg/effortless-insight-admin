@@ -31,7 +31,7 @@ import {
   useUpdatePlan,
   usePlanDetail,
 } from '@/hooks/use-plans'
-import { PLAN_FEATURES } from '@/constants/features'
+import { PLAN_FEATURES, BILLING_CYCLES, getFeaturesByCategory, FEATURE_CATEGORY_LABELS } from '@/constants/features'
 import type { CreatePlanRequest, UpdatePlanRequest } from '@/types/admin'
 
 const planSchema = z.object({
@@ -44,17 +44,24 @@ const planSchema = z.object({
   description: z.string().optional(),
 
   // Pricing (in rupees, will be converted to paise)
-  pricingMonthly: z.number().min(0, 'Monthly price must be positive').optional(),
-  pricingAnnually: z.number().min(0, 'Annual price must be positive').optional(),
-  perSeatMonthly: z.number().min(0, 'Per-seat monthly price must be positive').optional(),
-  perSeatAnnually: z.number().min(0, 'Per-seat annual price must be positive').optional(),
+  pricingWeekly: z.number().min(0, 'Weekly price must be positive').optional().nullable(),
+  pricingMonthly: z.number().min(0, 'Monthly price must be positive').optional().nullable(),
+  pricingAnnually: z.number().min(0, 'Annual price must be positive').optional().nullable(),
+  perSeatWeekly: z.number().min(0, 'Per-seat weekly price must be positive').optional().nullable(),
+  perSeatMonthly: z.number().min(0, 'Per-seat monthly price must be positive').optional().nullable(),
+  perSeatAnnually: z.number().min(0, 'Per-seat annual price must be positive').optional().nullable(),
   currency: z.string(),
   contactSales: z.boolean(),
   startingAt: z.number().min(0, 'Starting price must be positive').optional(),
 
   // Razorpay IDs
-  razorpayPlanIdMonthly: z.string().optional(),
-  razorpayPlanIdAnnually: z.string().optional(),
+  razorpayPlanIdWeekly: z.string().optional().nullable(),
+  razorpayPlanIdMonthly: z.string().optional().nullable(),
+  razorpayPlanIdAnnually: z.string().optional().nullable(),
+
+  // Billing cycles
+  allowedBillingCycles: z.array(z.string()).min(1, 'At least one billing cycle must be allowed'),
+  defaultBillingCycle: z.string().min(1, 'Default billing cycle is required'),
 
   // Limits
   noticesPerMonth: z.number().int().min(0, 'Notices must be 0 or positive'),
@@ -63,6 +70,7 @@ const planSchema = z.object({
   organizationsCount: z.number().int().min(1, 'Must allow at least 1 organization'),
   additionalUsersAllowed: z.boolean(),
   apiCalls: z.number().int().min(0, 'API calls must be 0 or positive'),
+  gstinsAllowed: z.number().int().min(-1, 'GSTINs must be -1 (unlimited) or positive'),
 
   // Features
   features: z.array(z.string()),
@@ -72,6 +80,7 @@ const planSchema = z.object({
   isPopular: z.boolean(),
   trialDays: z.number().int().min(0),
   sortOrder: z.number().int().min(0),
+  isCaOperatorPlan: z.boolean(),
 })
 
 type PlanFormData = z.infer<typeof planSchema>
@@ -94,6 +103,7 @@ export function PlanEditorDialog({
   const [unlimitedNotices, setUnlimitedNotices] = useState(false)
   const [unlimitedUsers, setUnlimitedUsers] = useState(false)
   const [unlimitedStorage, setUnlimitedStorage] = useState(false)
+  const [unlimitedGstins, setUnlimitedGstins] = useState(false)
 
   const { data: existingPlan, isLoading: isLoadingPlan } = usePlanDetail(planId || undefined)
   const createMutation = useCreatePlan()
@@ -106,26 +116,33 @@ export function PlanEditorDialog({
       name: '',
       displayName: '',
       description: '',
+      pricingWeekly: undefined,
       pricingMonthly: undefined,
       pricingAnnually: undefined,
+      perSeatWeekly: undefined,
       perSeatMonthly: undefined,
       perSeatAnnually: undefined,
       currency: 'INR',
       contactSales: false,
       startingAt: undefined,
+      razorpayPlanIdWeekly: undefined,
       razorpayPlanIdMonthly: undefined,
       razorpayPlanIdAnnually: undefined,
+      allowedBillingCycles: ['annually'],
+      defaultBillingCycle: 'annually',
       noticesPerMonth: 100,
       users: 5,
       storageGb: 10,
       organizationsCount: 1,
       additionalUsersAllowed: false,
       apiCalls: 10000,
+      gstinsAllowed: 1,
       features: [],
       isActive: true,
       isPopular: false,
       trialDays: 14,
       sortOrder: 0,
+      isCaOperatorPlan: false,
     },
   })
 
@@ -136,32 +153,40 @@ export function PlanEditorDialog({
       setUnlimitedNotices(existingPlan.limits.noticesPerMonth === -1)
       setUnlimitedUsers(existingPlan.limits.users === -1)
       setUnlimitedStorage(existingPlan.limits.storageGb === -1)
+      setUnlimitedGstins(existingPlan.limits.gstinsAllowed === -1)
 
       form.reset({
         code: existingPlan.code,
         name: existingPlan.name,
         displayName: existingPlan.displayName,
         description: existingPlan.description || '',
+        pricingWeekly: existingPlan.pricingWeekly ? existingPlan.pricingWeekly / 100 : undefined,
         pricingMonthly: existingPlan.pricingMonthly ? existingPlan.pricingMonthly / 100 : undefined,
         pricingAnnually: existingPlan.pricingAnnually ? existingPlan.pricingAnnually / 100 : undefined,
+        perSeatWeekly: existingPlan.perSeatWeekly ? existingPlan.perSeatWeekly / 100 : undefined,
         perSeatMonthly: existingPlan.perSeatMonthly ? existingPlan.perSeatMonthly / 100 : undefined,
         perSeatAnnually: existingPlan.perSeatAnnually ? existingPlan.perSeatAnnually / 100 : undefined,
         currency: existingPlan.currency,
         contactSales: existingPlan.contactSales,
         startingAt: existingPlan.startingAt ? existingPlan.startingAt / 100 : undefined,
+        razorpayPlanIdWeekly: existingPlan.razorpayPlanIdWeekly || undefined,
         razorpayPlanIdMonthly: existingPlan.razorpayPlanIdMonthly || undefined,
         razorpayPlanIdAnnually: existingPlan.razorpayPlanIdAnnually || undefined,
+        allowedBillingCycles: existingPlan.allowedBillingCycles || ['annually'],
+        defaultBillingCycle: existingPlan.defaultBillingCycle || 'annually',
         noticesPerMonth: existingPlan.limits.noticesPerMonth === -1 ? 0 : existingPlan.limits.noticesPerMonth,
         users: existingPlan.limits.users === -1 ? 0 : existingPlan.limits.users,
         storageGb: existingPlan.limits.storageGb === -1 ? 0 : existingPlan.limits.storageGb,
         organizationsCount: existingPlan.limits.organizationsCount,
         additionalUsersAllowed: existingPlan.limits.additionalUsersAllowed,
         apiCalls: existingPlan.limits.apiCalls,
+        gstinsAllowed: existingPlan.limits.gstinsAllowed === -1 ? 0 : existingPlan.limits.gstinsAllowed,
         features: existingPlan.features,
         isActive: existingPlan.isActive,
         isPopular: existingPlan.isPopular,
         trialDays: existingPlan.trialDays,
         sortOrder: existingPlan.sortOrder,
+        isCaOperatorPlan: existingPlan.isCaOperatorPlan || false,
       })
     }
   }, [existingPlan, isEditing, form])
@@ -172,31 +197,39 @@ export function PlanEditorDialog({
       setUnlimitedNotices(false)
       setUnlimitedUsers(false)
       setUnlimitedStorage(false)
+      setUnlimitedGstins(false)
       form.reset({
         code: '',
         name: '',
         displayName: '',
         description: '',
+        pricingWeekly: undefined,
         pricingMonthly: undefined,
         pricingAnnually: undefined,
+        perSeatWeekly: undefined,
         perSeatMonthly: undefined,
         perSeatAnnually: undefined,
         currency: 'INR',
         contactSales: false,
         startingAt: undefined,
+        razorpayPlanIdWeekly: undefined,
         razorpayPlanIdMonthly: undefined,
         razorpayPlanIdAnnually: undefined,
+        allowedBillingCycles: ['annually'],
+        defaultBillingCycle: 'annually',
         noticesPerMonth: 100,
         users: 5,
         storageGb: 10,
         organizationsCount: 1,
         additionalUsersAllowed: false,
         apiCalls: 10000,
+        gstinsAllowed: 1,
         features: [],
         isActive: true,
         isPopular: false,
         trialDays: 14,
         sortOrder: 0,
+        isCaOperatorPlan: false,
       })
       setActiveTab('pricing')
     }
@@ -214,15 +247,20 @@ export function PlanEditorDialog({
       name: data.name,
       displayName: data.displayName,
       description: data.description || undefined,
+      pricingWeekly: convertToPaise(data.pricingWeekly),
       pricingMonthly: convertToPaise(data.pricingMonthly),
       pricingAnnually: convertToPaise(data.pricingAnnually),
+      perSeatWeekly: convertToPaise(data.perSeatWeekly),
       perSeatMonthly: convertToPaise(data.perSeatMonthly),
       perSeatAnnually: convertToPaise(data.perSeatAnnually),
       currency: data.currency,
       contactSales: data.contactSales,
       startingAt: convertToPaise(data.startingAt),
+      razorpayPlanIdWeekly: data.razorpayPlanIdWeekly || undefined,
       razorpayPlanIdMonthly: data.razorpayPlanIdMonthly || undefined,
       razorpayPlanIdAnnually: data.razorpayPlanIdAnnually || undefined,
+      allowedBillingCycles: data.allowedBillingCycles,
+      defaultBillingCycle: data.defaultBillingCycle,
       limits: {
         noticesPerMonth: unlimitedNotices ? -1 : data.noticesPerMonth,
         users: unlimitedUsers ? -1 : data.users,
@@ -230,12 +268,14 @@ export function PlanEditorDialog({
         organizationsCount: data.organizationsCount,
         additionalUsersAllowed: data.additionalUsersAllowed,
         apiCalls: data.apiCalls,
+        gstinsAllowed: unlimitedGstins ? -1 : data.gstinsAllowed,
       },
       features: data.features,
       isActive: data.isActive,
       isPopular: data.isPopular,
       trialDays: data.trialDays,
       sortOrder: data.sortOrder,
+      isCaOperatorPlan: data.isCaOperatorPlan,
     }
 
     if (isEditing && planId) {
@@ -355,19 +395,31 @@ export function PlanEditorDialog({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pricingWeekly">Weekly Price (₹)</Label>
+                    <Input
+                      id="pricingWeekly"
+                      type="number"
+                      {...form.register('pricingWeekly', { valueAsNumber: true })}
+                      placeholder="25"
+                    />
+                    {form.formState.errors.pricingWeekly && (
+                      <p className="text-sm text-destructive">{form.formState.errors.pricingWeekly.message}</p>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="pricingMonthly">Monthly Price (₹)</Label>
                     <Input
                       id="pricingMonthly"
                       type="number"
                       {...form.register('pricingMonthly', { valueAsNumber: true })}
-                      placeholder="999"
+                      placeholder="99"
                     />
                     {form.formState.errors.pricingMonthly && (
                       <p className="text-sm text-destructive">{form.formState.errors.pricingMonthly.message}</p>
                     )}
-                    <p className="text-xs text-muted-foreground">Leave empty for enterprise plans</p>
                   </div>
 
                   <div className="space-y-2">
@@ -376,12 +428,26 @@ export function PlanEditorDialog({
                       id="pricingAnnually"
                       type="number"
                       {...form.register('pricingAnnually', { valueAsNumber: true })}
-                      placeholder="9990"
+                      placeholder="999"
                     />
                     {form.formState.errors.pricingAnnually && (
                       <p className="text-sm text-destructive">{form.formState.errors.pricingAnnually.message}</p>
                     )}
-                    <p className="text-xs text-muted-foreground">Typically 10 months worth (2 months free)</p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground">Leave prices empty for enterprise/contact sales plans. Prices are in Rupees (will be converted to paise).</p>
+
+                {/* Per-Seat Pricing */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="perSeatWeekly">Per Seat Weekly (₹)</Label>
+                    <Input
+                      id="perSeatWeekly"
+                      type="number"
+                      {...form.register('perSeatWeekly', { valueAsNumber: true })}
+                      placeholder="10"
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -390,11 +456,8 @@ export function PlanEditorDialog({
                       id="perSeatMonthly"
                       type="number"
                       {...form.register('perSeatMonthly', { valueAsNumber: true })}
-                      placeholder="499"
+                      placeholder="40"
                     />
-                    {form.formState.errors.perSeatMonthly && (
-                      <p className="text-sm text-destructive">{form.formState.errors.perSeatMonthly.message}</p>
-                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -403,11 +466,67 @@ export function PlanEditorDialog({
                       id="perSeatAnnually"
                       type="number"
                       {...form.register('perSeatAnnually', { valueAsNumber: true })}
-                      placeholder="4990"
+                      placeholder="400"
                     />
-                    {form.formState.errors.perSeatAnnually && (
-                      <p className="text-sm text-destructive">{form.formState.errors.perSeatAnnually.message}</p>
-                    )}
+                  </div>
+                </div>
+
+                {/* Billing Cycles Configuration */}
+                <div className="space-y-4 border rounded-lg p-4">
+                  <h4 className="font-medium">Billing Cycles</h4>
+                  <div className="flex flex-wrap gap-4">
+                    {BILLING_CYCLES.map((cycle) => {
+                      const allowedCycles = form.watch('allowedBillingCycles') || []
+                      const isChecked = allowedCycles.includes(cycle.value)
+                      return (
+                        <div key={cycle.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`cycle-${cycle.value}`}
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                form.setValue('allowedBillingCycles', [...allowedCycles, cycle.value])
+                              } else {
+                                const newCycles = allowedCycles.filter((c: string) => c !== cycle.value)
+                                form.setValue('allowedBillingCycles', newCycles)
+                                // Update default if we removed it
+                                if (form.watch('defaultBillingCycle') === cycle.value && newCycles.length > 0) {
+                                  form.setValue('defaultBillingCycle', newCycles[0])
+                                }
+                              }
+                            }}
+                          />
+                          <label htmlFor={`cycle-${cycle.value}`} className="text-sm">
+                            Allow {cycle.label}
+                          </label>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {form.formState.errors.allowedBillingCycles && (
+                    <p className="text-sm text-destructive">{form.formState.errors.allowedBillingCycles.message}</p>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="defaultBillingCycle">Default Billing Cycle</Label>
+                    <Select
+                      value={form.watch('defaultBillingCycle') || 'annually'}
+                      onValueChange={(value) => value && form.setValue('defaultBillingCycle', value)}
+                    >
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(form.watch('allowedBillingCycles') || ['annually']).map((cycle: string) => (
+                          <SelectItem key={cycle} value={cycle}>
+                            {BILLING_CYCLES.find(c => c.value === cycle)?.label || cycle}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Shown by default when user selects this plan
+                    </p>
                   </div>
                 </div>
 
@@ -433,7 +552,16 @@ export function PlanEditorDialog({
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="razorpayPlanIdWeekly">Razorpay Plan ID (Weekly)</Label>
+                    <Input
+                      id="razorpayPlanIdWeekly"
+                      {...form.register('razorpayPlanIdWeekly')}
+                      placeholder="plan_xxxxx"
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="razorpayPlanIdMonthly">Razorpay Plan ID (Monthly)</Label>
                     <Input
@@ -441,7 +569,6 @@ export function PlanEditorDialog({
                       {...form.register('razorpayPlanIdMonthly')}
                       placeholder="plan_xxxxx"
                     />
-                    <p className="text-xs text-muted-foreground">Optional: Link to Razorpay recurring plan</p>
                   </div>
 
                   <div className="space-y-2">
@@ -453,6 +580,7 @@ export function PlanEditorDialog({
                     />
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground">Optional: Link to Razorpay recurring plans for auto-renewal</p>
               </TabsContent>
 
               {/* LIMITS TAB */}
@@ -551,6 +679,29 @@ export function PlanEditorDialog({
                     )}
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="gstinsAllowed">GSTINs Allowed</Label>
+                    <Input
+                      id="gstinsAllowed"
+                      type="number"
+                      {...form.register('gstinsAllowed', { valueAsNumber: true })}
+                      disabled={unlimitedGstins}
+                      placeholder="1"
+                    />
+                    {form.formState.errors.gstinsAllowed && (
+                      <p className="text-sm text-destructive">{form.formState.errors.gstinsAllowed.message}</p>
+                    )}
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="unlimitedGstins"
+                        checked={unlimitedGstins}
+                        onCheckedChange={(checked) => setUnlimitedGstins(checked as boolean)}
+                      />
+                      <label htmlFor="unlimitedGstins" className="text-sm">Unlimited</label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Max GSTINs organization can link</p>
+                  </div>
+
                   <div className="flex items-center space-x-2 pt-6">
                     <Switch
                       id="additionalUsersAllowed"
@@ -563,21 +714,28 @@ export function PlanEditorDialog({
               </TabsContent>
 
               {/* FEATURES TAB */}
-              <TabsContent value="features" className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {PLAN_FEATURES.map((feature) => (
-                    <div key={feature.code} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={feature.code}
-                        checked={form.watch('features').includes(feature.code)}
-                        onCheckedChange={() => toggleFeature(feature.code)}
-                      />
-                      <label htmlFor={feature.code} className="text-sm cursor-pointer">
-                        {feature.label}
-                      </label>
+              <TabsContent value="features" className="space-y-6 mt-4">
+                {Object.entries(getFeaturesByCategory()).map(([category, features]) => (
+                  <div key={category} className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                      {FEATURE_CATEGORY_LABELS[category] || category}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {features.map((feature) => (
+                        <div key={feature.code} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={feature.code}
+                            checked={form.watch('features').includes(feature.code)}
+                            onCheckedChange={() => toggleFeature(feature.code)}
+                          />
+                          <label htmlFor={feature.code} className="text-sm cursor-pointer">
+                            {feature.label}
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </TabsContent>
 
               {/* SETTINGS TAB */}
@@ -626,6 +784,20 @@ export function PlanEditorDialog({
                   <p className="text-sm text-muted-foreground ml-2">
                     Only active plans are visible on the pricing page
                   </p>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="isCaOperatorPlan"
+                      checked={form.watch('isCaOperatorPlan')}
+                      onCheckedChange={(checked) => form.setValue('isCaOperatorPlan', checked)}
+                    />
+                    <Label htmlFor="isCaOperatorPlan">CA Operator Plan</Label>
+                    <p className="text-sm text-muted-foreground ml-2">
+                      Always free for Chartered Accountant operators. Admin assigns this plan to verified CAs.
+                    </p>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

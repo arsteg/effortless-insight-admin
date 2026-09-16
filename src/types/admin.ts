@@ -430,10 +430,12 @@ export interface AdminPlan {
   name: string
   displayName: string
   description?: string
-  pricingMonthly?: number // in paise
-  pricingAnnually?: number // in paise
-  perSeatMonthly?: number
-  perSeatAnnually?: number
+  pricingWeekly?: number | null // in paise
+  pricingMonthly?: number | null // in paise
+  pricingAnnually?: number | null // in paise
+  perSeatWeekly?: number | null
+  perSeatMonthly?: number | null
+  perSeatAnnually?: number | null
   currency: string
   limits: PlanLimits
   features: string[]
@@ -443,8 +445,15 @@ export interface AdminPlan {
   sortOrder: number
   contactSales: boolean
   startingAt?: number
-  razorpayPlanIdMonthly?: string
-  razorpayPlanIdAnnually?: string
+  razorpayPlanIdWeekly?: string | null
+  razorpayPlanIdMonthly?: string | null
+  razorpayPlanIdAnnually?: string | null
+  /** Allowed billing cycles for this plan (e.g., ["weekly", "monthly", "annually"]) */
+  allowedBillingCycles: string[]
+  /** Default billing cycle when user doesn't specify */
+  defaultBillingCycle: string
+  /** Whether this plan is for CA operator accounts (always free) */
+  isCaOperatorPlan: boolean
   subscriberCount: number
   createdAt: string
   updatedAt?: string
@@ -458,6 +467,8 @@ export interface PlanLimits {
   organizationsCount: number
   additionalUsersAllowed: boolean
   apiCalls: number
+  /** Maximum GSTINs allowed. -1 for unlimited */
+  gstinsAllowed: number
 }
 
 export interface AdminPlanListItem {
@@ -465,13 +476,18 @@ export interface AdminPlanListItem {
   code: string
   name: string
   displayName: string
-  pricingMonthly?: number
-  pricingAnnually?: number
+  pricingWeekly?: number | null
+  pricingMonthly?: number | null
+  pricingAnnually?: number | null
   currency: string
   isActive: boolean
   isPopular: boolean
   sortOrder: number
   subscriberCount: number
+  allowedBillingCycles: string[]
+  defaultBillingCycle: string
+  isCaOperatorPlan: boolean
+  limits?: PlanLimits
   createdAt: string
   updatedAt?: string
 }
@@ -490,10 +506,12 @@ export interface CreatePlanRequest {
   name: string
   displayName: string
   description?: string
-  pricingMonthly?: number
-  pricingAnnually?: number
-  perSeatMonthly?: number
-  perSeatAnnually?: number
+  pricingWeekly?: number | null
+  pricingMonthly?: number | null
+  pricingAnnually?: number | null
+  perSeatWeekly?: number | null
+  perSeatMonthly?: number | null
+  perSeatAnnually?: number | null
   currency: string
   limits: PlanLimits
   features: string[]
@@ -503,18 +521,24 @@ export interface CreatePlanRequest {
   sortOrder: number
   contactSales: boolean
   startingAt?: number
-  razorpayPlanIdMonthly?: string
-  razorpayPlanIdAnnually?: string
+  razorpayPlanIdWeekly?: string | null
+  razorpayPlanIdMonthly?: string | null
+  razorpayPlanIdAnnually?: string | null
+  allowedBillingCycles: string[]
+  defaultBillingCycle: string
+  isCaOperatorPlan: boolean
 }
 
 export interface UpdatePlanRequest {
   name?: string
   displayName?: string
   description?: string
-  pricingMonthly?: number
-  pricingAnnually?: number
-  perSeatMonthly?: number
-  perSeatAnnually?: number
+  pricingWeekly?: number | null
+  pricingMonthly?: number | null
+  pricingAnnually?: number | null
+  perSeatWeekly?: number | null
+  perSeatMonthly?: number | null
+  perSeatAnnually?: number | null
   currency?: string
   limits?: PlanLimits
   features?: string[]
@@ -524,8 +548,12 @@ export interface UpdatePlanRequest {
   sortOrder?: number
   contactSales?: boolean
   startingAt?: number
-  razorpayPlanIdMonthly?: string
-  razorpayPlanIdAnnually?: string
+  razorpayPlanIdWeekly?: string | null
+  razorpayPlanIdMonthly?: string | null
+  razorpayPlanIdAnnually?: string | null
+  allowedBillingCycles?: string[]
+  defaultBillingCycle?: string
+  isCaOperatorPlan?: boolean
 }
 
 export interface AdminPlanListResponse {
