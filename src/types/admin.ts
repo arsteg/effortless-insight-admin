@@ -184,6 +184,10 @@ export interface AdminUserListItem {
     name: string
   }
   plan: string
+  /** Self-registered Chartered Accountant account (ApplicationUser.IsCA). */
+  isCA: boolean
+  /** True if an admin-granted Free CA Access record is currently active for this user. */
+  hasActiveFreeCaAccess: boolean
   createdAt: string
   lastLoginAt?: string
 }
@@ -193,10 +197,22 @@ export interface AdminUserSearchParams {
   status?: string
   plan?: string
   organizationId?: string
+  isCA?: boolean
   sortBy?: string
   sortDesc?: boolean
   page?: number
   pageSize?: number
+}
+
+export interface CaFreeAccessGrant {
+  id: string
+  isActive: boolean
+  grantedAt: string
+  grantedByAdminName: string
+  grantReason: string
+  revokedAt?: string
+  revokedByAdminName?: string
+  revokeReason?: string
 }
 
 export interface AdminUserDetailResponse {
@@ -208,6 +224,8 @@ export interface AdminUserDetailResponse {
   emailVerified: boolean
   phoneVerified: boolean
   twoFactorEnabled: boolean
+  isCA: boolean
+  caFreeAccessHistory: CaFreeAccessGrant[]
   organization?: AdminOrgDetail
   createdAt: string
   lastLoginAt?: string
@@ -654,6 +672,7 @@ export const ADMIN_PERMISSIONS = {
   USERS_DELETE: 'users:delete',
   USERS_IMPERSONATE: 'users:impersonate',
   USERS_RESET_PASSWORD: 'users:reset_password',
+  CA_ACCESS_MANAGE: 'users:ca_access_manage',
 
   // Organizations
   ORGS_VIEW: 'organizations:view',
