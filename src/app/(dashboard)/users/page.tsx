@@ -36,6 +36,7 @@ import { useOrganizations } from '@/hooks/use-organizations'
 import { SuspendUserDialog } from './_components/suspend-user-dialog'
 import { ImpersonateUserDialog } from './_components/impersonate-user-dialog'
 import { DeleteUserDialog } from './_components/delete-user-dialog'
+import { CaAccessDialog } from './_components/ca-access-dialog'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -43,6 +44,7 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
   const [organizationFilter, setOrganizationFilter] = useState<string>('all')
+  const [caFilter, setCaFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
@@ -50,6 +52,8 @@ export default function UsersPage() {
   const [suspendUser, setSuspendUser] = useState<AdminUserListItem | null>(null)
   const [impersonateUser, setImpersonateUser] = useState<AdminUserListItem | null>(null)
   const [deleteUser, setDeleteUser] = useState<AdminUserListItem | null>(null)
+  const [caAccessUser, setCaAccessUser] = useState<AdminUserListItem | null>(null)
+  const [caAccessMode, setCaAccessMode] = useState<'grant' | 'revoke'>('grant')
 
   // Bulk selection state
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set())
@@ -62,6 +66,7 @@ export default function UsersPage() {
     status: statusFilter !== 'all' ? statusFilter : undefined,
     plan: planFilter !== 'all' ? planFilter : undefined,
     organizationId: organizationFilter !== 'all' ? organizationFilter : undefined,
+    isCA: caFilter !== 'all' ? caFilter === 'ca' : undefined,
     page,
     pageSize,
   })
@@ -187,9 +192,17 @@ export default function UsersPage() {
       key: 'plan',
       header: 'Plan',
       cell: (user) => (
-        <Badge variant="outline" className="capitalize">
-          {user.plan}
-        </Badge>
+        <div className="flex flex-wrap items-center gap-1">
+          <Badge variant="outline" className="capitalize">
+            {user.plan}
+          </Badge>
+          {user.isCA && <Badge variant="secondary">CA</Badge>}
+          {user.hasActiveFreeCaAccess && (
+            <Badge variant="default" className="whitespace-nowrap">
+              Free Access
+            </Badge>
+          )}
+        </div>
       ),
     },
     {
@@ -263,6 +276,31 @@ export default function UsersPage() {
                   </DropdownMenuItem>
                 )}
               </RequirePermission>
+              {user.isCA && (
+                <RequirePermission permission={ADMIN_PERMISSIONS.CA_ACCESS_MANAGE}>
+                  {user.hasActiveFreeCaAccess ? (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setCaAccessUser(user)
+                        setCaAccessMode('revoke')
+                      }}
+                    >
+                      <UserX className="mr-2 h-4 w-4" />
+                      Revoke Free CA Access
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setCaAccessUser(user)
+                        setCaAccessMode('grant')
+                      }}
+                    >
+                      <UserCheck className="mr-2 h-4 w-4" />
+                      Grant Free CA Access
+                    </DropdownMenuItem>
+                  )}
+                </RequirePermission>
+              )}
             </DropdownMenuGroup>
             <RequirePermission permission={ADMIN_PERMISSIONS.USERS_DELETE}>
               <DropdownMenuSeparator />
@@ -342,6 +380,19 @@ export default function UsersPage() {
               <SelectItem value="starter">Starter</SelectItem>
               <SelectItem value="professional">Professional</SelectItem>
               <SelectItem value="enterprise">Enterprise</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Select value={caFilter} onValueChange={(value) => { setCaFilter(value ?? 'all'); setPage(1) }}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Account Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="all">All Accounts</SelectItem>
+              <SelectItem value="ca">CA Accounts</SelectItem>
+              <SelectItem value="non-ca">Non-CA Accounts</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -434,6 +485,12 @@ export default function UsersPage() {
         user={deleteUser}
         open={!!deleteUser}
         onOpenChange={(open) => !open && setDeleteUser(null)}
+      />
+      <CaAccessDialog
+        user={caAccessUser}
+        mode={caAccessMode}
+        open={!!caAccessUser}
+        onOpenChange={(open) => !open && setCaAccessUser(null)}
       />
     </div>
   )

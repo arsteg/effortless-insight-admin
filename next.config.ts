@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   output: 'standalone',
+  experimental: {
+    // Reduce compiler memory when running the Webpack development server.
+    webpackMemoryOptimizations: true,
+  },
 };
 
 export default nextConfig;

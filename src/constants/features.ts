@@ -2,11 +2,13 @@
  * Plan feature codes and labels.
  * Used for configuring subscription plan features in the admin portal.
  *
- * Features are organized by tier:
+ * Clean set of 15 technical features organized by category:
  * - Core (Free tier): notice_detection, email_notifications, push_notifications
  * - AI (Paid tiers): ai_explanation, draft_reply, whatsapp_assistant, multilingual_support
- * - Team tier: collaboration, custom_roles, audit_trail, advanced_analytics
- * - Enterprise: sso, api_access, workflows, sla_guarantee, priority_support
+ * - Team: collaboration, advanced_analytics
+ * - Premium: workflows, bulk_operations, data_export
+ * - CA: ca_client_management
+ * - Enterprise: sso, api_access
  */
 export const PLAN_FEATURES = [
   // === Core Features (Free Tier) ===
@@ -19,41 +21,22 @@ export const PLAN_FEATURES = [
   { code: 'draft_reply', label: 'Draft Reply', category: 'ai' },
   { code: 'whatsapp_assistant', label: 'WhatsApp Assistant', category: 'ai' },
   { code: 'multilingual_support', label: 'Multilingual Support', category: 'ai' },
-  { code: 'full_ai_analysis', label: 'Full AI Analysis', category: 'ai' },
-  { code: 'priority_processing', label: 'Priority Processing', category: 'ai' },
 
   // === Team Features ===
   { code: 'collaboration', label: 'Team Collaboration', category: 'team' },
-  { code: 'custom_roles', label: 'Custom Roles', category: 'team' },
-  { code: 'audit_trail', label: 'Audit Trail', category: 'team' },
   { code: 'advanced_analytics', label: 'Advanced Analytics', category: 'team' },
-  { code: 'advanced_reporting', label: 'Advanced Reporting', category: 'team' },
-  { code: 'bulk_operations', label: 'Bulk Operations', category: 'team' },
-  { code: 'advanced_filters', label: 'Advanced Filters', category: 'team' },
-  { code: 'audit_logs', label: 'Audit Logs', category: 'team' },
+
+  // === Premium Features ===
+  { code: 'workflows', label: 'Workflows', category: 'premium' },
+  { code: 'bulk_operations', label: 'Bulk Operations', category: 'premium' },
+  { code: 'data_export', label: 'Data Export', category: 'premium' },
+
+  // === CA Features ===
+  { code: 'ca_client_management', label: 'CA Client Management', category: 'ca' },
 
   // === Enterprise Features ===
   { code: 'sso', label: 'Single Sign-On (SSO)', category: 'enterprise' },
   { code: 'api_access', label: 'API Access', category: 'enterprise' },
-  { code: 'workflows', label: 'Custom Workflows', category: 'enterprise' },
-  { code: 'advanced_workflows', label: 'Advanced Workflows', category: 'enterprise' },
-  { code: 'sla_guarantee', label: 'SLA Guarantee', category: 'enterprise' },
-  { code: 'priority_support', label: 'Priority Support', category: 'enterprise' },
-  { code: 'dedicated_manager', label: 'Dedicated Account Manager', category: 'enterprise' },
-  { code: 'custom_integrations', label: 'Custom Integrations', category: 'enterprise' },
-  { code: 'custom_branding', label: 'Custom Branding', category: 'enterprise' },
-  { code: 'custom_domain', label: 'Custom Domain', category: 'enterprise' },
-
-  // === Support Features ===
-  { code: 'email_support', label: 'Email Support', category: 'support' },
-  { code: 'phone_support', label: 'Phone Support', category: 'support' },
-  { code: 'training', label: 'Training & Onboarding', category: 'support' },
-
-  // === Other Features ===
-  { code: 'data_export', label: 'Data Export', category: 'other' },
-  { code: 'multi_org', label: 'Multiple Organizations', category: 'other' },
-  { code: 'whatsapp_integration', label: 'WhatsApp Integration (Legacy)', category: 'other' },
-  { code: 'sso_integration', label: 'SSO Integration (Legacy)', category: 'other' },
 ] as const;
 
 export type PlanFeatureCode = typeof PLAN_FEATURES[number]['code'];
@@ -76,9 +59,9 @@ export const FEATURE_CATEGORY_LABELS: Record<string, string> = {
   core: 'Core Features',
   ai: 'AI Features',
   team: 'Team Features',
+  premium: 'Premium Features',
+  ca: 'CA Features',
   enterprise: 'Enterprise Features',
-  support: 'Support',
-  other: 'Other',
 };
 
 /** Billing cycle options */

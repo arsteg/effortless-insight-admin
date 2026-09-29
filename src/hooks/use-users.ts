@@ -101,6 +101,40 @@ export function useEndImpersonation() {
   })
 }
 
+export function useGrantCaAccess() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
+      adminApi.users.grantCaAccess(userId, reason),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.userId) })
+      toast.success('Free CA Access granted successfully')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to grant Free CA Access')
+    },
+  })
+}
+
+export function useRevokeCaAccess() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
+      adminApi.users.revokeCaAccess(userId, reason),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.userId) })
+      toast.success('Free CA Access revoked successfully')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to revoke Free CA Access')
+    },
+  })
+}
+
 export function useDeleteUser() {
   const queryClient = useQueryClient()
 
