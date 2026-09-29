@@ -2,13 +2,11 @@
  * Plan feature codes and labels.
  * Used for configuring subscription plan features in the admin portal.
  *
- * Clean set of 15 technical features organized by category:
+ * Clean set of 11 technical features organized by category:
  * - Core (Free tier): notice_detection, email_notifications, push_notifications
- * - AI (Paid tiers): ai_explanation, draft_reply, whatsapp_assistant, multilingual_support
+ * - AI (Paid tiers): ai_explanation, draft_reply, whatsapp_assistant
  * - Team: collaboration, advanced_analytics
  * - Premium: workflows, bulk_operations, data_export
- * - CA: ca_client_management
- * - Enterprise: sso, api_access
  */
 export const PLAN_FEATURES = [
   // === Core Features (Free Tier) ===
@@ -20,7 +18,6 @@ export const PLAN_FEATURES = [
   { code: 'ai_explanation', label: 'AI Explanation', category: 'ai' },
   { code: 'draft_reply', label: 'Draft Reply', category: 'ai' },
   { code: 'whatsapp_assistant', label: 'WhatsApp Assistant', category: 'ai' },
-  { code: 'multilingual_support', label: 'Multilingual Support', category: 'ai' },
 
   // === Team Features ===
   { code: 'collaboration', label: 'Team Collaboration', category: 'team' },
@@ -30,13 +27,6 @@ export const PLAN_FEATURES = [
   { code: 'workflows', label: 'Workflows', category: 'premium' },
   { code: 'bulk_operations', label: 'Bulk Operations', category: 'premium' },
   { code: 'data_export', label: 'Data Export', category: 'premium' },
-
-  // === CA Features ===
-  { code: 'ca_client_management', label: 'CA Client Management', category: 'ca' },
-
-  // === Enterprise Features ===
-  { code: 'sso', label: 'Single Sign-On (SSO)', category: 'enterprise' },
-  { code: 'api_access', label: 'API Access', category: 'enterprise' },
 ] as const;
 
 export type PlanFeatureCode = typeof PLAN_FEATURES[number]['code'];
@@ -60,8 +50,6 @@ export const FEATURE_CATEGORY_LABELS: Record<string, string> = {
   ai: 'AI Features',
   team: 'Team Features',
   premium: 'Premium Features',
-  ca: 'CA Features',
-  enterprise: 'Enterprise Features',
 };
 
 /** Billing cycle options */
