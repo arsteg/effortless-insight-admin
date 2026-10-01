@@ -142,6 +142,12 @@ export const adminUsersApi = {
   delete: async (userId: string, reason: string, gdprRequest: boolean, confirmed: boolean): Promise<void> => {
     await adminClient.delete(`/admin/users/${userId}`, { data: { reason, gdprRequest, confirmed } })
   },
+  grantCaAccess: async (userId: string, reason: string): Promise<void> => {
+    await adminClient.post(`/admin/users/${userId}/ca-access/grant`, { reason })
+  },
+  revokeCaAccess: async (userId: string, reason: string): Promise<void> => {
+    await adminClient.post(`/admin/users/${userId}/ca-access/revoke`, { reason })
+  },
 }
 
 export const adminOrganizationsApi = {

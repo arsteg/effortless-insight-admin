@@ -1,6 +1,6 @@
 'use client'
 
-import { use } from 'react'
+import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import {
@@ -13,6 +13,7 @@ import {
   Shield,
   FileText,
   Activity,
+  BadgeCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +23,10 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PageHeader, StatusBadge, LoadingState } from '@/components/common'
+import { RequirePermission } from '@/components/auth'
+import { ADMIN_PERMISSIONS } from '@/types/admin'
 import { useUserDetail } from '@/hooks/use-users'
+import { CaAccessDialog } from '../_components/ca-access-dialog'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -32,6 +36,7 @@ export default function UserDetailPage({ params }: PageProps) {
   const resolvedParams = use(params)
   const router = useRouter()
   const { data: user, isLoading, error } = useUserDetail(resolvedParams.id)
+  const [caAccessDialogMode, setCaAccessDialogMode] = useState<'grant' | 'revoke' | null>(null)
 
   if (isLoading) {
     return <LoadingState message="Loading user details..." />
@@ -47,6 +52,8 @@ export default function UserDetailPage({ params }: PageProps) {
       </div>
     )
   }
+
+  const activeCaGrant = user.caFreeAccessHistory.find((grant) => grant.isActive)
 
   const getInitials = (name: string) => {
     return name
@@ -75,7 +82,10 @@ export default function UserDetailPage({ params }: PageProps) {
                 <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
               </Avatar>
               <h2 className="text-xl font-semibold">{user.name}</h2>
-              <StatusBadge status={user.status} className="mt-2" />
+              <div className="flex items-center gap-2 mt-2">
+                <StatusBadge status={user.status} />
+                {user.isCA && <Badge variant="secondary">CA</Badge>}
+              </div>
 
               <Separator className="my-4" />
 
@@ -251,6 +261,82 @@ export default function UserDetailPage({ params }: PageProps) {
           </Tabs>
         </Card>
       </div>
+
+      {user.isCA && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <BadgeCheck className="h-5 w-5" />
+                  CA Status
+                </CardTitle>
+                <CardDescription>
+                  Self-registered Chartered Accountant account. Free access is granted per-CA by
+                  an admin and applies to every organization this user owns.
+                </CardDescription>
+              </div>
+              <RequirePermission permission={ADMIN_PERMISSIONS.CA_ACCESS_MANAGE}>
+                {activeCaGrant ? (
+                  <Button variant="destructive" onClick={() => setCaAccessDialogMode('revoke')}>
+                    Revoke Free Access
+                  </Button>
+                ) : (
+                  <Button onClick={() => setCaAccessDialogMode('grant')}>
+                    Grant Free Access
+                  </Button>
+                )}
+              </RequirePermission>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">Free CA Access</span>
+              <Badge variant={activeCaGrant ? 'default' : 'secondary'}>
+                {activeCaGrant ? 'Active' : 'Not granted'}
+              </Badge>
+            </div>
+
+            {user.caFreeAccessHistory.length > 0 ? (
+              <div className="space-y-3">
+                {user.caFreeAccessHistory.map((grant) => (
+                  <div key={grant.id} className="rounded-lg border p-3 text-sm space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">
+                        {grant.isActive ? 'Granted' : 'Granted then revoked'}
+                      </span>
+                      <Badge variant={grant.isActive ? 'default' : 'outline'} className="text-xs">
+                        {grant.isActive ? 'Active' : 'Revoked'}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground">
+                      Granted {format(new Date(grant.grantedAt), 'MMM d, yyyy HH:mm')} by{' '}
+                      {grant.grantedByAdminName} &mdash; &ldquo;{grant.grantReason}&rdquo;
+                    </p>
+                    {!grant.isActive && grant.revokedAt && (
+                      <p className="text-muted-foreground">
+                        Revoked {format(new Date(grant.revokedAt), 'MMM d, yyyy HH:mm')} by{' '}
+                        {grant.revokedByAdminName} &mdash; &ldquo;{grant.revokeReason}&rdquo;
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                No Free CA Access has ever been granted to this user.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <CaAccessDialog
+        user={user}
+        mode={caAccessDialogMode ?? 'grant'}
+        open={caAccessDialogMode !== null}
+        onOpenChange={(open) => !open && setCaAccessDialogMode(null)}
+      />
     </div>
   )
 }
