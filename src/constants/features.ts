@@ -15,6 +15,7 @@ export const PLAN_FEATURES = [
   { code: 'push_notifications', label: 'Push Notifications', category: 'core' },
 
   // === AI Features (Paid Tiers) ===
+  { code: 'ask_ai', label: 'Ask AI', category: 'ai' },
   { code: 'ai_explanation', label: 'AI Explanation', category: 'ai' },
   { code: 'draft_reply', label: 'Draft Reply', category: 'ai' },
   { code: 'whatsapp_assistant', label: 'WhatsApp Assistant', category: 'ai' },
